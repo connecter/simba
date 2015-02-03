@@ -42,7 +42,8 @@ http {
 
         # BOSH
         location /http-bind/ {
-            proxy_pass      http://172.17.42.1:5280/http-bind/;
+            resolver         8.8.8.8 valid=300s;
+            proxy_pass       %XMPP_BIND_URL%;
             proxy_set_header X-Forwarded-For $remote_addr;
             proxy_set_header Host $http_host;
         }

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DEFAULT_XMPP_BIND_URL="http://172.17.42.1:5280/http-bind/"
+NGINX_CONFIG_IN="/etc/nginx/nginx.conf.in"
+NGINX_CONFIG="/etc/nginx/nginx.conf"
+
+if [ -z "$XMPP_BIND_URL" ]; then
+  echo "[WARN] XMPP_BIND_URL not defined. Using default: $DEFAULT_XMPP_BIND_URL"
+  XMPP_BIND_URL=DEFAULT_XMPP_BIND_URL
+fi
+
+sed "s|%XMPP_BIND_URL%|$XMPP_BIND_URL|g" "$NGINX_CONFIG_IN" > "$NGINX_CONFIG"
+
+exec nginx -g "daemon off;"
