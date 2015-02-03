@@ -51,6 +51,13 @@ gulp.task('fonts', function () {
     .pipe(gulp.dest('dist/fonts'));
 });
 
+// TODO temporarily copy the entire meet directory
+gulp.task('meet', function () {
+  return gulp.src([
+    'app/meet/**'
+  ]).pipe(gulp.dest('dist/meet'));
+});
+
 gulp.task('extras', function () {
   return gulp.src([
     'app/*.*',
@@ -119,7 +126,7 @@ gulp.task('watch', ['connect'], function () {
   gulp.watch('bower.json', ['wiredep']);
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'meet', 'extras'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
