@@ -4,6 +4,11 @@
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 
+// TODO move this externally
+var config = {
+  xmppBindUrl: 'http://www.connecter.io/http-bind/'
+};
+
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.css')
     .pipe($.autoprefixer({browsers: ['last 1 version']}))
@@ -59,15 +64,19 @@ gulp.task('extras', function () {
 gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 
 gulp.task('connect', function () {
+  var url = require('url');
+
   var serveStatic = require('serve-static');
   var serveIndex = require('serve-index');
   var modRewrite = require('connect-modrewrite');
+  var proxy = require('proxy-middleware');
 
   var app = require('connect')()
     .use(require('connect-livereload')({port: 35729}))
     .use(modRewrite([
-      '^/([a-zA-Z0-9]+)$ /index.html'
+      '^/([a-zA-Z0-9]+)$ /index.html',
     ]))
+    .use('/http-bind/', proxy(url.parse(config.xmppBindUrl)))
     .use(serveStatic('.tmp'))
     .use(serveStatic('app'))
     // paths to bower_components should be relative to the current file
