@@ -61,8 +61,13 @@ gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 gulp.task('connect', function () {
   var serveStatic = require('serve-static');
   var serveIndex = require('serve-index');
+  var modRewrite = require('connect-modrewrite');
+
   var app = require('connect')()
     .use(require('connect-livereload')({port: 35729}))
+    .use(modRewrite([
+      '^/([a-zA-Z0-9]+)$ /index.html'
+    ]))
     .use(serveStatic('.tmp'))
     .use(serveStatic('app'))
     // paths to bower_components should be relative to the current file
