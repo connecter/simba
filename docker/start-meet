@@ -6,7 +6,7 @@ NGINX_CONFIG="/etc/nginx/nginx.conf"
 
 if [ -z "$XMPP_BIND_URL" ]; then
   echo "[WARN] XMPP_BIND_URL not defined. Using default: $DEFAULT_XMPP_BIND_URL"
-  XMPP_BIND_URL=DEFAULT_XMPP_BIND_URL
+  XMPP_BIND_URL="$DEFAULT_XMPP_BIND_URL"
 fi
 
 sed "s|%XMPP_BIND_URL%|$XMPP_BIND_URL|g" "$NGINX_CONFIG_IN" > "$NGINX_CONFIG"
