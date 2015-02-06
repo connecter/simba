@@ -34,3 +34,28 @@ var config = {
     // will work when simulcast, bundle, mux, lastN and SCTP are disabled.
     logStats: false // Enable logging of PeerConnection stats via the focus
 };
+
+var interfaceConfig = {
+    CANVAS_EXTRA: 104,
+    CANVAS_RADIUS: 7,
+    SHADOW_COLOR: '#ffffff',
+    INITIAL_TOOLBAR_TIMEOUT: 20000,
+    TOOLBAR_TIMEOUT: 4000,
+    DEFAULT_REMOTE_DISPLAY_NAME: "Fellow Jitster",
+    DEFAULT_DOMINANT_SPEAKER_DISPLAY_NAME: "Speaker",
+    DEFAULT_LOCAL_DISPLAY_NAME: "me",
+    SHOW_JITSI_WATERMARK: false,
+    JITSI_WATERMARK_LINK: "http://www.connecter.io",
+    SHOW_BRAND_WATERMARK: false,
+    BRAND_WATERMARK_LINK: "",
+    SHOW_POWERED_BY: false,
+    GENERATE_ROOMNAMES_ON_WELCOME_PAGE: true,
+    APP_NAME: "Connecter",
+    INVITATION_POWERED_BY: true,
+    ACTIVE_SPEAKER_AVATAR_SIZE: 100
+};
+
+module.exports = {
+    general: config,
+    interface: interfaceConfig
+}
