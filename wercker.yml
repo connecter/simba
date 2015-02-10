@@ -1,0 +1,97 @@
+box: wercker-labs/docker
+
+build:
+  steps:
+    - install-packages:
+        packages: nodejs nodejs-legacy npm git
+
+    - script:
+        name: update nodejs and npm
+        code: |
+          sudo npm install -g npm
+          sudo npm install -g n
+          sudo n stable
+
+    - script:
+        name: echo nodejs information
+        code: |
+          echo "node version $(node -v) running"
+          echo "npm version $(npm -v) running"
+
+    # Local npm install
+    - npm-install:
+        options: .
+
+    # npm dev utilities
+    - npm-install:
+        options: bower
+
+    - script:
+        name: install bower dependencies
+        code: |
+          ./node_modules/bower/bin/bower install
+
+    - script:
+        name: build gulp dist
+        code: |
+          ./node_modules/gulp/bin/gulp.js build
+
+    - script:
+        name: output release version
+        code: |
+          git describe --tags --always --long --dirty > "$WERCKER_OUTPUT_DIR/release_tag"
+
+    - script:
+        name: build docker image
+        code: |
+          docker build -t simba .
+
+    - script:
+        name: tag with release version
+        code: |
+          docker tag simba connecter/simba:$(cat release_tag)
+
+    - script:
+        name: tag with build name # change to build name env later
+        code: |
+          docker tag simba connecter/simba:staging
+
+    - script:
+        name: login to docker
+        code: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL
+
+    - script:
+        name: publish docker image with release version
+        code: |
+          docker push connecter/simba:$(cat release_tag)
+
+    - script:
+        name: publish docker image with build version # change to build name env later
+        code: |
+          docker push connecter/simba:staging
+
+    - script:
+        name: echo docker pull command
+        code: |
+          echo "docker pull connecter/simba:$(cat release_tag)"
+          echo "docker pull connecter/simba:staging"
+
+deploy:
+  steps:
+    - add-to-known_hosts:
+        hostname: www.connecter.io
+
+    - mktemp:
+       envvar: PRIVATEKEY_PATH
+
+    - create-file:
+       name: write key
+       filename: $PRIVATEKEY_PATH
+       content: $FLEET_DEPLOY_KEY_PRIVATE
+       overwrite: true
+       hide-from-log: true
+
+    - script:
+       name: restart simba
+       code: ssh -i $PRIVATEKEY_PATH -l core -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no www.connecter.io "fleetctl stop simba@1.service && fleetctl start simba@1.service"
