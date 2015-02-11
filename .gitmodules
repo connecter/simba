@@ -1,3 +1,6 @@
 [submodule "meet"]
 	path = app/meet
 	url = https://github.com/jitsi/jitsi-meet.git
+[submodule "app/images"]
+	path = app/images
+	url = git@bitbucket.org:connecter/connecter.io-design-files-and-assets.git

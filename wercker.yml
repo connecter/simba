@@ -3,7 +3,7 @@ box: wercker-labs/docker
 build:
   steps:
     - install-packages:
-        packages: nodejs nodejs-legacy npm git
+        packages: nodejs nodejs-legacy npm git ruby ruby-bundler
 
     - script:
         name: update nodejs and npm
@@ -23,13 +23,18 @@ build:
         options: .
 
     # npm dev utilities
-    - npm-install:
-        options: bower
+    # - npm-install:
+    #     options: bower
+
+    # - script:
+    #     name: install bower dependencies
+    #     code: |
+    #       ./node_modules/bower/bin/bower install
 
     - script:
-        name: install bower dependencies
+        name: install ruby-sass and sass css importer gem
         code: |
-          ./node_modules/bower/bin/bower install
+          bundle install
 
     - script:
         name: build gulp dist
