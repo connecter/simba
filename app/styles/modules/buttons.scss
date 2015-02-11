@@ -1,0 +1,57 @@
+.btn-icon {
+  -webkit-appearance: none;
+  border: none;
+  height: 40px;
+  width: 40px;
+  &:hover, &:focus, &:active {
+    cursor: pointer;
+    outline: none;
+  }
+}
+
+@mixin button-icon-background($icon) {
+  background: url("../images/Icon/#{$icon}.svg");
+
+  &:hover, &:focus {
+    background: url("../images/Icon/#{$icon}_hover.svg");
+  }
+
+  &:active {
+    background: url("../images/Icon/#{$icon}_click.svg");
+  }
+}
+
+$buttons-list: "add", "add_selected", "arrow-left", "arrow-right", "attach", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "mic_off", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo", "video", "video_off";
+
+$buttons-with-active-state-list: "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen""screenshare", "snapshot", "text", "video";
+
+$buttons-with-disabled-state-list: "clear", "undo";
+
+@each $button in $buttons-list {
+  .btn-#{$button} {
+    @include button-icon-background($button);
+  }
+}
+
+@each $button in $buttons-with-active-state-list {
+  .btn-#{$button} {
+    &.toggled {
+      background: url("../images/Icon/#{icon}_selected.svg");
+    }
+  }
+}
+
+@each $button in $buttons-with-disabled-state-list {
+  .btn-#{$button} {
+    &.disabled, &:disabled {
+      background: url("../images/Icon/#{icon}_greyout.svg");
+    }
+  }
+}
+
+.btn-group {
+  li {
+    display: inline-block;
+    margin-left: 8px;
+  }
+}

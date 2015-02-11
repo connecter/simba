@@ -17,7 +17,7 @@ module.exports = {
     }
   },
   images: {
-    src: [src + "/images/**" , meetPath + "/images/**"],
+    src: [src + "/images/**/**" , meetPath + "/images/**"],
     dest: dest + "/images"
   },  
   sounds: {

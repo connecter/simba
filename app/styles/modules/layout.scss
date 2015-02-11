@@ -1,0 +1,96 @@
+$header-height: 45px;
+$footer-height: 60px;
+$leftbar-width: 140px;
+$rightbar-width: 255px;
+$common-bg: #2c2e33;
+
+.row, .col {
+  overflow: hidden;
+  position: absolute;
+}
+
+.row {
+    left: 0;
+    right: 0;
+}
+
+.col {
+    top: 0;
+    bottom: $footer-height;
+}
+
+header {
+  top: 0;
+  height: $header-height;
+  background-color: $common-bg;
+  padding-left: $leftbar-width;
+  padding-right: $rightbar-width;
+}
+
+.save-input {
+  -webkit-appearance: none;
+  background: none;
+  display: block;
+  width: 100%;
+  border-style: none;
+  font-size: 18px;
+  height: $header-height;
+  font-weight: 300;
+  padding: 0 20px;
+  color: #fff;
+  outline: none;
+}
+
+footer {
+  bottom: 0;
+  height: $footer-height;
+  background-color: $common-bg;
+  padding: 10px;
+}
+
+.presentation {
+  top: $header-height;
+  bottom: $footer-height;
+  background-color: #ddd;
+}
+
+.participants, .discussions {
+  .toggle {
+    background: #000;
+    height: 45px;
+    padding: 2px;
+  }
+}
+
+.participants {
+  left: 0px;
+  width: $leftbar-width;
+  .bg {
+    opacity: 0.6;
+    background-color: $common-bg;
+    height: 100%;
+  }
+}
+
+.discussions {
+  right: 0;
+  width: $rightbar-width;
+
+  .bg, .chat, .notes {
+    height: 100%;
+  }
+}
+
+.chat {
+  .bg {
+    background-color: $common-bg;
+    opacity: 0.6;
+  }
+}
+
+.notes {
+  .bg {
+    opacity: 0.8;
+    background-color: #fff; 
+  }
+}
