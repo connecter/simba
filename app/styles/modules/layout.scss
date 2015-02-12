@@ -4,6 +4,12 @@ $leftbar-width: 140px;
 $rightbar-width: 255px;
 $common-bg: #2c2e33;
 
+@for $i from -5 through 5 {
+  .z-index-level_#{$i} {
+    z-index: $i;
+  }
+}
+
 .row, .col {
   overflow: hidden;
   position: absolute;
@@ -49,12 +55,15 @@ footer {
 }
 
 .presentation {
+  @extend .z-index-level_-5;
   top: $header-height;
   bottom: $footer-height;
   background-color: #ddd;
 }
 
 .participants, .discussions {
+  transition: all 0.5s; 
+
   .toggle {
     background: #000;
     height: 45px;
@@ -73,7 +82,11 @@ footer {
   .bg {
     opacity: 0.6;
     background-color: $common-bg;
-    height: 100%;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    @extend .z-index-level_-1;
   }
 }
 

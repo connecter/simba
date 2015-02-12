@@ -2,11 +2,12 @@
 
 var React = require('react');
 
-var Header = require('./header')
-var Footer = require('./footer')
-var Participants = require('./participants')
-var Discussions = require('./discussions')
-var Presentation = require('./presentation')
+var Header = require('./header'),
+    Footer = require('./footer'),
+    Participants = require('./participants'),
+    Discussions = require('./discussions'),
+    Presentation = require('./presentation'),
+    data = require('../mockdata');
 
 var Container = React.createClass({
 
@@ -15,7 +16,7 @@ var Container = React.createClass({
       <div>
         <Header></Header>
         <Presentation></Presentation>
-        <Participants></Participants>
+        <Participants pariticipants={data.participants}></Participants>
         <Discussions></Discussions>
         <Footer></Footer>
       </div>

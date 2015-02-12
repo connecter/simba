@@ -1,9 +1,11 @@
-@import "modules/reset";
+@import "vendor/reset";
 
 @import "modules/helpers";
 
-@import "modules/layout";
-
 @import "modules/typography";
 
+@import "modules/layout";
+
 @import "modules/buttons";
+
+@import "modules/participants";
