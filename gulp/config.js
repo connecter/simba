@@ -9,6 +9,7 @@ module.exports = {
   },
   sass: {
     src: src + "/styles/",
+    entryFile: "main.scss",
     dest: dest + '/styles',
     settings: {
       // sourcemap: true, // TODO fix error while enabling source m

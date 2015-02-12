@@ -1,3 +1,62 @@
 .participant {
   margin-bottom: 12px;
 }
+
+.invite {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: none;
+  min-width: 140px;
+  height: 80px;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+
+  @include button-icon-background("add");
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  .bg {
+    @extend .z-index-level_-4 ;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    opacity: 0.6;
+    background: #B3B3B3;  
+  }
+  
+  &.is-toggled {
+    background-image: none;
+    cursor: default;
+    width: 730px;
+  }
+
+  .btn-add {
+    margin-left: 50px;
+    margin-top: 20px;
+  }
+}
+
+.invite-form {
+  margin: 0 30px 0 0;
+  padding: 20px 0;
+
+  input {
+    font-size: 16px;
+    padding: 8px 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    width: 260px;
+  }
+
+  .vertical-seperator {
+    border-right: 1px solid #fff;
+    height: 60px;
+    margin: 0 20px;
+    padding: 9px 0;
+  }
+}

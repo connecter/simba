@@ -11,7 +11,6 @@ $common-bg: #2c2e33;
 }
 
 .row, .col {
-  overflow: hidden;
   position: absolute;
 }
 
@@ -86,7 +85,7 @@ footer {
     width: 100%;
     top: 0;
     bottom: 0;
-    @extend .z-index-level_-1;
+    @extend .z-index-level_-4;
   }
 }
 

@@ -1,6 +1,20 @@
-.btn-icon {
+$buttons-list: "add", "arrow-left", "arrow-right", "attach", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "mic_off", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo", "video", "video_off";
+
+$buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen""screenshare", "snapshot", "text", "video";
+
+$buttons-with-disabled-state-list: "clear", "undo";
+
+$primary-button-bg: #3bafda;
+
+.btn-reset {
   -webkit-appearance: none;
+  appearance: none;
   border: none;
+  background: none;
+}
+
+.btn-icon {
+  @extend .btn-reset;
   height: 40px;
   width: 40px;
   &:hover, &:focus, &:active {
@@ -10,22 +24,16 @@
 }
 
 @mixin button-icon-background($icon) {
-  background: url("../images/Icon/#{$icon}.svg");
+  background-image: url("../images/Icon/#{$icon}.svg");
 
   &:hover, &:focus {
-    background: url("../images/Icon/#{$icon}_hover.svg");
+    background-image: url("../images/Icon/#{$icon}_hover.svg");
   }
 
   &:active {
-    background: url("../images/Icon/#{$icon}_click.svg");
+    background-image: url("../images/Icon/#{$icon}_click.svg");
   }
 }
-
-$buttons-list: "add", "add_selected", "arrow-left", "arrow-right", "attach", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "mic_off", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo", "video", "video_off";
-
-$buttons-with-active-state-list: "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen""screenshare", "snapshot", "text", "video";
-
-$buttons-with-disabled-state-list: "clear", "undo";
 
 @each $button in $buttons-list {
   .btn-#{$button} {
@@ -33,10 +41,10 @@ $buttons-with-disabled-state-list: "clear", "undo";
   }
 }
 
-@each $button in $buttons-with-active-state-list {
+@each $button in $buttons-with-toggled-state-list {
   .btn-#{$button} {
     &.is-toggled {
-      background: url("../images/Icon/#{$button}_selected.svg");
+      background-image: url("../images/Icon/#{$button}_selected.svg");
     }
   }
 }
@@ -44,8 +52,24 @@ $buttons-with-disabled-state-list: "clear", "undo";
 @each $button in $buttons-with-disabled-state-list {
   .btn-#{$button} {
     &.disabled, &:disabled {
-      background: url("../images/Icon/#{$button}_greyout.svg");
+      background-image: url("../images/Icon/#{$button}_greyout.svg");
     }
+  }
+}
+
+.btn-primary {
+  @extend .btn-reset;
+  background-color: $primary-button-bg;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 8px 20px;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: darken($primary-button-bg, 6%);
   }
 }
 

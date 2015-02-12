@@ -3,6 +3,8 @@
 var React = require('react/addons'),
     _ = require('lodash');
 
+var Invite = require("./invite");
+
 var Participans = React.createClass({
   propTypes: {
     pariticipants: React.PropTypes.array.isRequired
@@ -18,9 +20,9 @@ var Participans = React.createClass({
 
   renderParticipants: function() {
     var participants = []
-    _.forEach(this.props.pariticipants, function(participant) {
+    _.forEach(this.props.pariticipants, function(participant, key) {
       participants.push(
-        <div className="participant">
+        <div className="participant" key={key}>
           <img src={participant.image} alt={participant.name} />
         </div>
       )
@@ -33,13 +35,13 @@ var Participans = React.createClass({
      var classes = cx({
       'is-collapsed': this.state.collapsed,
     });
-     console.log(this.renderParticipants());
     return (
       <section className={"participants col " + classes}>
         <div className="toggle">
           <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         {this.renderParticipants()}
+        <Invite />
         <div className="bg"></div>
       </section>
     );

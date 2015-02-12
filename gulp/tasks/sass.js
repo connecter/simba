@@ -7,7 +7,7 @@ var config       = require('../config').sass;
 var autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('sass', function () {
-  return sass(config.src, config.settings)
+  return sass(config.src + config.entryFile, config.settings)
     .on('error', handleErrors)
     .pipe(sourcemaps.write())
     .pipe(autoprefixer({ browsers: ['last 2 version'] }))
