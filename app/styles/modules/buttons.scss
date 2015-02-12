@@ -35,8 +35,8 @@ $buttons-with-disabled-state-list: "clear", "undo";
 
 @each $button in $buttons-with-active-state-list {
   .btn-#{$button} {
-    &.toggled {
-      background: url("../images/Icon/#{icon}_selected.svg");
+    &.is-toggled {
+      background: url("../images/Icon/#{$button}_selected.svg");
     }
   }
 }
@@ -44,7 +44,7 @@ $buttons-with-disabled-state-list: "clear", "undo";
 @each $button in $buttons-with-disabled-state-list {
   .btn-#{$button} {
     &.disabled, &:disabled {
-      background: url("../images/Icon/#{icon}_greyout.svg");
+      background: url("../images/Icon/#{$button}_greyout.svg");
     }
   }
 }

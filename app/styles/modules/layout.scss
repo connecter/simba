@@ -63,8 +63,13 @@ footer {
 }
 
 .participants {
-  left: 0px;
+  left: 0;
   width: $leftbar-width;
+  
+  &.is-collapsed {
+    left: -#{$leftbar-width};
+  }
+
   .bg {
     opacity: 0.6;
     background-color: $common-bg;
@@ -75,6 +80,14 @@ footer {
 .discussions {
   right: 0;
   width: $rightbar-width;
+  
+  &.is-collapsed {
+    right: -#{$rightbar-width};
+    .toggle {
+      position: fixed;
+      right: -80px;
+    }
+  }
 
   .bg, .chat, .notes {
     height: 100%;
