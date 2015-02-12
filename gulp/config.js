@@ -38,6 +38,7 @@ module.exports = {
     bundleConfigs: [{
       entries: src + '/scripts/main.js',
       dest: dest + '/scripts',
+      extensions: ['.jsx'],
       outputName: 'main.js'
     }, {
       entries: src + '/scripts/meetLayer.js',

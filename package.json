@@ -25,6 +25,8 @@
     "lodash": "^2.4.1",
     "pretty-hrtime": "~0.2.1",
     "proxy-middleware": "^0.11.0",
+    "react": "^0.12.2",
+    "reactify": "^1.0.0",
     "require-dir": "^0.1.0",
     "url": "^0.10.2",
     "vinyl-source-stream": "~0.1.1",
