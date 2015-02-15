@@ -1,6 +1,6 @@
 $buttons-list: "add", "arrow-left", "arrow-right", "attach", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "mic_off", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo", "video", "video_off";
 
-$buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen""screenshare", "snapshot", "text", "video";
+$buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "snapshot", "text", "video";
 
 $buttons-with-disabled-state-list: "clear", "undo";
 
@@ -17,6 +17,7 @@ $primary-button-bg: #3bafda;
   @extend .btn-reset;
   height: 40px;
   width: 40px;
+  background-repeat: no-repeat;
   &:hover, &:focus, &:active {
     cursor: pointer;
     outline: none;

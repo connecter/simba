@@ -52,6 +52,7 @@ header {
 }
 
 footer {
+  @extend .z-index-level_3;
   bottom: 0;
   height: $footer-height;
   background-color: $common-bg;
@@ -122,5 +123,27 @@ footer {
   .bg {
     opacity: 0.8;
     background-color: #fff; 
+  }
+}
+
+.screenshare {
+  @extend .z-index-level_2;
+
+  .bg {
+    opacity: 0.75;
+    background-color: #3bafda;
+    height: 100%;
+
+  }
+  bottom: 60px;
+  height: 0;
+  visibility: hidden;
+
+  transition: all 0.5s;
+
+  &.is-open {
+    height: 175px;
+    visibility: visible;
+    display: block;
   }
 }
