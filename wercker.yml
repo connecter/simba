@@ -18,6 +18,13 @@ build:
           echo "node version $(node -v) running"
           echo "npm version $(npm -v) running"
 
+    - script:
+        name: install meet dependencies
+        code: |
+          cd app/meet
+          sudo npm install
+          cd -
+
     # Local npm install
     - npm-install:
         options: .
