@@ -41,7 +41,7 @@
 }
 
 .invite-form {
-  margin: 0 30px 0 0;
+  margin: 0 28px 0 0;
   padding: 20px 0;
 
   input {
@@ -51,6 +51,7 @@
     appearance: none;
     border: none;
     width: 260px;
+    outline: none;
   }
 
   .vertical-seperator {

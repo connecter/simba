@@ -1,13 +1,38 @@
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 
 var Footer = React.createClass({
 
+  getInitialState: function() {
+    return {isToolbarExpanded: false}
+  },
+
+  toggleToolbar: function() {
+    this.setState({isToolbarExpanded: !this.state.isToolbarExpanded});
+  },
+
   render: function() {
+
+    var cx = React.addons.classSet,
+      toolbarClasses = cx({
+        'is-expanded': this.state.isToolbarExpanded,
+      }),
+
+      toggleButtonClasses = cx({
+        'btn-arrow-right': !this.state.isToolbarExpanded,
+        'btn-arrow-left': this.state.isToolbarExpanded
+      }),
+
+
+      toggleButtonText = cx({
+        'Show more': !this.state.isToolbarExpanded,
+        'Show less': this.state.isToolbarExpanded
+      });
+
     return (
       <footer className="row">
-        <ul className="btn-group pull-left">
+        <ul className={"toolbar btn-group pull-left " + toolbarClasses}>
           <li><button className="btn-icon btn-screenshare" title="Share my screen"><span className="sr-only">Share my screen</span></button></li>
           <li><div className="vertical-seperator"></div></li>
           <li><button className="btn-icon btn-cursor" title="Show my cursor to participants"><span className="sr-only">Show my cursor to participants</span></button></li>
@@ -18,6 +43,7 @@ var Footer = React.createClass({
           <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>
           <li><div className="vertical-seperator"></div></li>
         </ul>
+        <button className={"btn-icon " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>  
         <ul className="btn-group pull-right">
           <li><button className="btn-icon btn-mic" title="Turn mic on"><span className="sr-only">Turn mic off</span></button></li>
           <li><button className="btn-icon btn-video" title="Turn video off"><span className="sr-only">Turn video off</span></button></li>

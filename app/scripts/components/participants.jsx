@@ -11,11 +11,15 @@ var Participans = React.createClass({
   },
 
   getInitialState: function() {
-    return {collapsed: false};
+    return {collapsed: false, isInviteOpen: false};
   },
 
   handleToggle: function() {
-    this.setState({collapsed: !this.state.collapsed});
+    this.setState({collapsed: !this.state.collapsed, isInviteOpen: false} );
+  },
+
+  toggleInviteBox: function() {
+    this.setState({isInviteOpen: !this.state.isInviteOpen});
   },
 
   renderParticipants: function() {
@@ -41,7 +45,7 @@ var Participans = React.createClass({
           <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         {this.renderParticipants()}
-        <Invite />
+        <Invite isInviteOpen={this.state.isInviteOpen} toggleInviteBox={this.toggleInviteBox} />
         <div className="bg"></div>
       </section>
     );

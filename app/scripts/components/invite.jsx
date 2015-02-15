@@ -3,33 +3,17 @@
 var React = require('react/addons');
 
 var Invite = React.createClass({
-
-  getInitialState: function() {
-    return {collapsed: true}
-  },
-
-  toggleInviteBox: function() {
-    this.setState({collapsed: !this.state.collapsed});
-  },
-
   render: function() {
     var cx = React.addons.classSet,
       containerClasses = cx({
-        'is-collapsed': this.state.collapsed,
+        'is-collapsed': this.props.isInviteOpen,
       });
 
-    if(this.state.collapsed) {
-      return (
-        <button className="invite" title="Invite" onClick={this.toggleInviteBox}>
-          <span className="sr-only">Invite</span>
-          <div className="bg"></div>
-        </button>
-      );
-    } else {
+    if(this.props.isInviteOpen) {
       return (
         <div className="invite is-toggled">
           <div className="bg"></div>
-          <button className="btn-icon btn-add is-toggled" title="Close" onClick={this.toggleInviteBox}>
+          <button className="btn-icon btn-add is-toggled" title="Close" onClick={this.props.toggleInviteBox}>
             <span className="sr-only">Close</span>
           </button>
           <div className="invite-form pull-right">
@@ -40,7 +24,14 @@ var Invite = React.createClass({
           </div>
           <div className="clearfix"></div>
         </div>
-      )
+      );
+    } else {
+      return (
+        <button className="invite" title="Add Participant" onClick={this.props.toggleInviteBox}>
+          <span className="sr-only">Add Participant</span>
+          <div className="bg"></div>
+        </button>
+      );
     }
   }
 

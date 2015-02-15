@@ -1,0 +1,11 @@
+.toolbar {
+  width:106px;
+  height: 40px;
+  overflow: hidden;
+  transition: all 0.2s linear; 
+
+  
+  &.is-expanded {
+    width: 300px;
+  }
+}

@@ -10,6 +10,11 @@ $common-bg: #2c2e33;
   }
 }
 
+body {
+  width: 100%;
+  overflow: hidden;
+}
+
 .row, .col {
   position: absolute;
 }
