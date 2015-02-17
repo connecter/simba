@@ -1,21 +1,13 @@
 var config = {
     hosts: {
-        domain: 'connecter.io',
-        //anonymousdomain: 'guest.example.com',
-        muc: 'conference.connecter.io', // FIXME: use XEP-0030
-        bridge: 'videobridge.connecter.io', // FIXME: use XEP-0030
-        //jirecon: 'jirecon.connecter.io',
-        //call_control: 'callcontrol.connecter.io',
-        focus: 'focus.connecter.io'
+      bridge: "jitsi-videobridge.meet.sipxecs.org",
+      call_control: "callcontrol.meet.sipxecs.org",
+      domain: "meet.sipxecs.org",
+      muc: "conference.meet.sipxecs.org"
     },
-//  getroomnode: function (path) { return 'someprefixpossiblybasedonpath'; },
-//  useStunTurn: true, // use XEP-0215 to fetch STUN and TURN server
-//  useIPv6: true, // ipv6 support. use at your own risk
     useNicks: false,
     bosh: '/http-bind/', // FIXME: use xep-0156 for that
     clientNode: 'http://jitsi.org/jitsimeet', // The name of client node advertised in XEP-0115 'c' stanza
-    //focusUserJid: 'focus@auth.connecter.io', // The real JID of focus participant - can be overridden here
-    //defaultSipNumber: '', // Default SIP number
     desktopSharing: 'ext', // Desktop sharing method. Can be set to 'ext', 'webrtc' or false to disable.
     chromeExtensionId: 'diibjkoicjeejcmhdnailmkgecihlobk', // Id of desktop streamer Chrome extension
     desktopSharingSources: ['screen', 'window'],
@@ -28,34 +20,10 @@ var config = {
     useRtcpMux: true,
     useBundle: true,
     enableRecording: false,
-    enableWelcomePage: true,
     enableSimulcast: false,
     enableFirefoxSupport: false, //firefox support is still experimental, only one-to-one conferences with chrome focus
     // will work when simulcast, bundle, mux, lastN and SCTP are disabled.
     logStats: false // Enable logging of PeerConnection stats via the focus
 };
 
-var interfaceConfig = {
-    CANVAS_EXTRA: 104,
-    CANVAS_RADIUS: 7,
-    SHADOW_COLOR: '#ffffff',
-    INITIAL_TOOLBAR_TIMEOUT: 20000,
-    TOOLBAR_TIMEOUT: 4000,
-    DEFAULT_REMOTE_DISPLAY_NAME: "Fellow Jitster",
-    DEFAULT_DOMINANT_SPEAKER_DISPLAY_NAME: "Speaker",
-    DEFAULT_LOCAL_DISPLAY_NAME: "me",
-    SHOW_JITSI_WATERMARK: false,
-    JITSI_WATERMARK_LINK: "http://www.connecter.io",
-    SHOW_BRAND_WATERMARK: false,
-    BRAND_WATERMARK_LINK: "",
-    SHOW_POWERED_BY: false,
-    GENERATE_ROOMNAMES_ON_WELCOME_PAGE: true,
-    APP_NAME: "Connecter",
-    INVITATION_POWERED_BY: true,
-    ACTIVE_SPEAKER_AVATAR_SIZE: 100
-};
-
-module.exports = {
-    general: config,
-    interface: interfaceConfig
-}
+module.exports = config
