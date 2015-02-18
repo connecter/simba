@@ -1,4 +1,4 @@
-$buttons-list: "add", "arrow-left", "arrow-right", "attach", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "mic_off", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo", "video", "video_off";
+$buttons-list: "add", "arrow-left", "arrow-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo";
 
 $buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "snapshot", "text", "video";
 
@@ -32,7 +32,7 @@ $primary-button-bg: #3bafda;
   }
 
   &:active {
-    background-image: url("../images/Icon/#{$icon}_click.svg");
+    background-image: url("../images/Icon/#{$icon}_active.svg");
   }
 }
 
@@ -45,7 +45,7 @@ $primary-button-bg: #3bafda;
 @each $button in $buttons-with-toggled-state-list {
   .btn-#{$button} {
     &.is-toggled {
-      background-image: url("../images/Icon/#{$button}_selected.svg");
+      background-image: url("../images/Icon/#{$button}_toggled.svg");
     }
   }
 }
@@ -53,7 +53,7 @@ $primary-button-bg: #3bafda;
 @each $button in $buttons-with-disabled-state-list {
   .btn-#{$button} {
     &.disabled, &:disabled {
-      background-image: url("../images/Icon/#{$button}_greyout.svg");
+      background-image: url("../images/Icon/#{$button}_disabled.svg");
     }
   }
 }

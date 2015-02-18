@@ -57,7 +57,7 @@ var Footer = React.createClass({
           <button className={"btn-icon " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>  
           <ul className="btn-group pull-right">
             <li><button className="btn-icon btn-mic" title="Turn mic on"><span className="sr-only">Turn mic off</span></button></li>
-            <li><button className="btn-icon btn-video" title="Turn video off"><span className="sr-only">Turn video off</span></button></li>
+            <li><button className="btn-icon btn-camera" title="Turn video off"><span className="sr-only">Turn video off</span></button></li>
             <li><button className="btn-icon btn-lock" title="Lock this room"><span className="sr-only">Lock this room</span></button></li>
             <li><button className="btn-icon btn-end-call" title="End call"><span className="sr-only">End call</span></button></li>
           </ul>
