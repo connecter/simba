@@ -29,3 +29,7 @@
   border-right: 1px solid #73787d;
   height: 40px;
 }
+
+.flip-x {
+  -webkit-transform: scaleX(-1);
+}

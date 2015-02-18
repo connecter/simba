@@ -13,6 +13,7 @@ $common-bg: #2c2e33;
 body {
   width: 100%;
   overflow: hidden;
+  background: #000; 
 }
 
 .row, .col {
@@ -63,7 +64,7 @@ footer {
   @extend .z-index-level_-5;
   top: $header-height;
   bottom: $footer-height;
-  background-color: #ddd;
+  background-color: #000;
 }
 
 .participants, .discussions {

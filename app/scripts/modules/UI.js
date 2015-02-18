@@ -36,16 +36,16 @@ function registerListeners() {
   APP.RTC.addListener(RTCEvents.DOMINANTSPEAKER_CHANGED, function (resourceJid) {
     View.onDominantSpeakerChanged(resourceJid);
   });
+
+  APP.RTC.addStreamListener(function (stream) {
+    View.onRemoteStreamAdded(stream);
+  }, StreamEventTypes.EVENT_TYPE_REMOTE_CREATED);
 }
 
 UI.start = function() {
   registerListeners();
   var Container = require('../components/container')
   View = React.render(React.createElement(Container), $('.connecter-wrap')[0]);
-}
-
-UI.getLargeVideoState = function() {
-  return View.getLargeVideoState();
 };
 
 UI.addListener = function (type, listener) {
@@ -57,6 +57,10 @@ UI.messageHandler = {
     alert(title + ' - ' + msg);
   }
 };
+
+UI.getLargeVideoState = function() {
+  return View.getLargeVideoState();
+}
 
 UI.disableConnect = function () {
   return; 

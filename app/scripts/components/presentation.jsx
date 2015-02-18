@@ -4,40 +4,51 @@ var React = require('react');
 
 var Presentation = React.createClass({
 
-  componentDidMount: function () {
-    var videoNode = this.refs.largeVideo.getDOMNode(),
-        audioNode = this.refs.localAudio.getDOMNode();
-    APP.RTC.attachMediaStream($(audioNode), this.props.localAudio.getOriginalStream());
+  componentDidMount: function() {
+    this.setup();
+  },
+
+  componentDidUpdate: function() {
+    this.setup();
+  },
+
+  componentWillUnmount: function() {
+    this.cleanUp();
+  },
+
+  componentWillUpdate: function() {
+    this.cleanUp();
+  },
+
+  setup: function () {
+    var videoNode = this.refs.largeVideo.getDOMNode();
     APP.RTC.attachMediaStream($(videoNode), this.props.largeVideo.getOriginalStream());
-    audioNode.volume = 0;
     $(videoNode).on('loadedmetadata', this.invokePositionLarge);
+  },
+  
+  cleanUp: function () {
+    var videoNode = this.refs.largeVideo.getDOMNode();    
+    $(videoNode).off('loadedmetadata', this.invokePositionLarge);
   },
 
   invokePositionLarge: function() {
-    var videoNode = this.refs.largeVideo.getDOMNode(),
-        audioNode = this.refs.localAudio.getDOMNode();        
+    var videoNode = this.refs.largeVideo.getDOMNode();
     this.positionLarge(videoNode.videoWidth, videoNode.videoHeight);
   },
 
-  componentWillUnmount: function () {
-    $(videoNode).off('loadedmetadata', this.invokePositionLarge)  
-  },
-
   getCameraVideoSize: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-
     var aspectRatio = videoWidth / videoHeight;
-
     var availableWidth = Math.max(videoWidth, videoSpaceWidth);
     var availableHeight = Math.max(videoHeight, videoSpaceHeight);
 
     if (availableWidth / aspectRatio < videoSpaceHeight) {
-        availableHeight = videoSpaceHeight;
-        availableWidth = availableHeight * aspectRatio;
+      availableHeight = videoSpaceHeight;
+      availableWidth = availableHeight * aspectRatio;
     }
 
     if (availableHeight * aspectRatio < videoSpaceWidth) {
-        availableWidth = videoSpaceWidth;
-        availableHeight = availableWidth / aspectRatio;
+      availableWidth = videoSpaceWidth;
+      availableHeight = availableWidth / aspectRatio;
     }
 
     return [availableWidth, availableHeight];
@@ -45,10 +56,10 @@ var Presentation = React.createClass({
 
   getCameraVideoPosition: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
     var isFullScreen = document.fullScreen ||
-        document.mozFullScreen ||
-        document.webkitIsFullScreen;
+      document.mozFullScreen ||
+      document.webkitIsFullScreen;
     if (isFullScreen)
-        videoSpaceHeight = window.innerHeight-100;
+      videoSpaceHeight = window.innerHeight-100;
 
     var horizontalIndent = (videoSpaceWidth - videoWidth) / 2;
     var verticalIndent = (videoSpaceHeight - videoHeight) / 2;
@@ -60,22 +71,19 @@ var Presentation = React.createClass({
     video.width(width);
     video.height(height);
     video.css({  top: verticalIndent + 'px',
-        bottom: verticalIndent + 'px',
-        left: horizontalIndent + 'px',
-        right: horizontalIndent + 'px',
-        position: "absolute",
-        "-webkit-transform": "scaleX(-1)"
-      });
+      bottom: verticalIndent + 'px',
+      left: horizontalIndent + 'px',
+      right: horizontalIndent + 'px',
+      position: "absolute"
+    });
   },
 
   positionLarge: function (videoWidth, videoHeight) {
     var videoSpaceWidth = $(this.refs.videoSpace.getDOMNode()).width();
     var videoSpaceHeight = window.innerHeight;
-
     var videoSize = this.getCameraVideoSize(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight);
     var largeVideoWidth = videoSize[0];
     var largeVideoHeight = videoSize[1];
-
     var videoPosition = this.getCameraVideoPosition(largeVideoWidth, largeVideoHeight, videoSpaceWidth, videoSpaceHeight);
     var horizontalIndent = videoPosition[0];
     var verticalIndent = videoPosition[1];
@@ -86,8 +94,7 @@ var Presentation = React.createClass({
   render: function() {
     return (
       <section className="presentation row" ref="videoSpace">
-        <video ref="largeVideo" autoPlay="true"></video>
-        <audio ref="localAudio" autoPlay="true"></audio>
+        <video ref="largeVideo" autoPlay="true" className="flip-x"></video>
       </section>
     );
   }
