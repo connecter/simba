@@ -12,25 +12,34 @@ var Participant = React.createClass({
 
   getInitialState: function () {
     var state = {};
-    if(this.props.participant.stream.type=="Video") {
-      state.video = this.props.participant.stream;
-    } 
+    if(this.props.participant.stream) {
+      if(this.props.participant.stream.type=="Video") {
+        state.video = this.props.participant.stream;
+      } 
 
-    if(this.props.participant.stream.type=="Audio") {
-      state.audio = this.props.participant.stream;
+      if(this.props.participant.stream.type=="Audio") {
+        state.audio = this.props.participant.stream;
+      }
     }
     return state;
   },
 
   componentWillReceiveProps: function(newProps) {
     var newState = {};
-    if(newProps.participant.stream.type=="Video") {
-      newState.video = newProps.participant.stream;
+    if(newProps.participant.stream) {
+      if(newProps.participant.stream.type=="Video") {
+        newState.video = newProps.participant.stream;
+      }
+
+      if(newProps.participant.stream.type=="Audio") {
+        newState.audio = newProps.participant.stream;
+      }
     }
 
-    if(newProps.participant.stream.type=="Audio") {
-      newState.audio = newProps.participant.stream;
+    if(newProps.participant.displayName) {
+      newState.displayName = newProps.participant.displayName;
     }
+
     this.setState(newState);
   },
 
@@ -49,6 +58,7 @@ var Participant = React.createClass({
   render: function() {
     return (
       <div className="participant">
+        <div className="participant-name">{this.props.participant.displayName}</div>
         {this.renderAudio()}
         {this.renderVideo()}
       </div>  

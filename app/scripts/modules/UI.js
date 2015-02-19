@@ -1,17 +1,39 @@
 var UI = {};
-
 var EventEmitter = require("events");
 var React = require("react");
-
 var RTCEvents = require("../../meet/service/RTC/RTCEvents");
 var StreamEventTypes = require("../../meet/service/RTC/StreamEventTypes");
 var XMPPEvents = require("../../meet/service/xmpp/XMPPEvents");
-
+var NicknameHandler = require("../../meet/modules/UI/util/NicknameHandler");
 var RoomNameGenerator = require("../../meet/modules/UI/welcome_page/RoomnameGenerator");
-
+var UIEvents = require("../../meet/service/UI/UIEvents");
 var eventEmitter = new EventEmitter();
 var roomName = null;
 var View;
+
+UI.messageHandler = require("./messageHandler");
+
+function registerListeners() {
+  APP.RTC.addStreamListener(streamHandler, StreamEventTypes.EVENT_TYPE_LOCAL_CREATED);  
+
+  APP.RTC.addStreamListener(streamHandler, StreamEventTypes.EVENT_TYPE_LOCAL_CHANGED);  
+ 
+  APP.RTC.addListener(RTCEvents.DOMINANTSPEAKER_CHANGED, onDominantSpeakerChanged);
+
+  APP.RTC.addStreamListener(remoteStreamHandler, StreamEventTypes.EVENT_TYPE_REMOTE_CREATED);
+
+  APP.xmpp.addListener(XMPPEvents.CHANGED_STREAMS, onChangedStreams);
+
+  APP.xmpp.addListener(XMPPEvents.MUC_JOINED, onMucJoined);
+
+  APP.xmpp.addListener(XMPPEvents.MUC_ENTER, onMucEntered);
+
+  APP.xmpp.addListener(XMPPEvents.MUC_LEFT, onMucLeft);
+  
+  APP.UI.addListener(UIEvents.NICKNAME_CHANGED, onNicknameChanged);
+
+  APP.xmpp.addListener(XMPPEvents.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
+}
 
 function streamHandler(stream) {
   switch (stream.type) {
@@ -27,36 +49,52 @@ function streamHandler(stream) {
   }
 }
 
+function remoteStreamHandler(stream) {
+  View.addStream(stream);
+}
 
-function registerListeners() {
-  APP.RTC.addStreamListener(streamHandler, StreamEventTypes.EVENT_TYPE_LOCAL_CREATED);  
+function onDominantSpeakerChanged(resourceJid) {
+  View.changeDominantSpeaker(resourceJid);
+}
 
-  APP.RTC.addStreamListener(streamHandler, StreamEventTypes.EVENT_TYPE_LOCAL_CHANGED);  
- 
-  APP.RTC.addListener(RTCEvents.DOMINANTSPEAKER_CHANGED, function (resourceJid) {
-    View.onDominantSpeakerChanged(resourceJid);
-  });
+function onChangedStreams(jid, changedStreams) {
+  View.checkMediaFlowAttributes(jid, changedStreams);
+}
 
-  APP.RTC.addStreamListener(function (stream) {
-    View.onRemoteStreamAdded(stream);
-  }, StreamEventTypes.EVENT_TYPE_REMOTE_CREATED);
+function onMucJoined(jid, info) {
+  if(NicknameHandler.getNickname()===null) {
+    NicknameHandler.setNickname(window.prompt("Your Nickname?"));
+  } else {
+    eventEmitter.emit(UIEvents.NICKNAME_CHANGED, NicknameHandler.getNickname());
+  }
+}
+
+function onMucEntered(jid, id, displayName) {
+  View.addParticipant(jid, id, displayName);
+}
+
+function onMucLeft(jid) {
+  View.deleteParticipant(jid);
+}
+
+function onNicknameChanged(nickname) {
+  View.setLocalName(nickname);
+}
+
+function onDisplayNameChanged(jid, displayName) {
+  View.changeParticipantName(jid, displayName);
 }
 
 UI.start = function() {
-  registerListeners();
-  var Container = require('../components/container')
+  var Container = require('../components/container');
   View = React.render(React.createElement(Container), $('.connecter-wrap')[0]);
+  registerListeners();
+  NicknameHandler.init(eventEmitter);
 };
 
 UI.addListener = function (type, listener) {
   eventEmitter.on(type, listener);
 }
-
-UI.messageHandler = {
-  showError: function(title, msg) {
-    alert(title + ' - ' + msg);
-  }
-};
 
 UI.getLargeVideoState = function() {
   return View.getLargeVideoState();
@@ -67,8 +105,8 @@ UI.disableConnect = function () {
 };
 
 UI.checkForNicknameAndJoin = function () {
-    var nick = null;
-    APP.xmpp.joinRoom(roomName, config.useNicks, nick);
+  var nick = null;
+  APP.xmpp.joinRoom(roomName, config.useNicks, nick);
 };
 
 UI.generateRoomName = function() {

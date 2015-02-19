@@ -24,6 +24,10 @@ var Container = React.createClass({
 
   changeLocalAudio: function(stream) {
     this.setState({localAudio: stream});
+
+    stream.getOriginalStream().onended = function() {
+      this.setState({localAudio: null});
+    }
   },
 
   changeLocalVideo: function(stream) {
@@ -32,7 +36,16 @@ var Container = React.createClass({
     if(this.state.largeVideo.userJid===null) {
       newState.largeVideo = {stream: stream, userJid: APP.xmpp.myResource()};
     }
+
     this.setState(newState);
+
+    stream.getOriginalStream().onended = function() {
+      this.setState({localVideo: null});
+    }
+  },
+
+  setLocalName: function(nickname) {
+    this.setState({localName: nickname});
   },
 
   toggleVideo: function() {
@@ -61,13 +74,18 @@ var Container = React.createClass({
     };
   },
 
-  onRemoteStreamAdded: function (stream) {
+  addStream: function (stream) {
     if (stream.peerjid) {
-      var newParticipant = {}
-      newParticipant['participant_' + Strophe.getResourceFromJid(stream.peerjid)] = {stream: stream}
-      this.setState({participants: _.assign(this.state.participants, newParticipant)});
+      var participantId = 'participant_' + Strophe.getResourceFromJid(stream.peerjid);
+      var participant = {};
+
+      participant[participantId] = this.state.participants[participantId] || {}
+      participant[participantId]['stream'] = stream; 
+
+      this.setState({participants: _.assign(this.state.participants, participant)});
     } else {
       var id = stream.getOriginalStream().id;
+
       if (id !== 'mixedmslabel'&& id !== 'default') {
         console.error('can not associate stream', id, 'with a participant');
         return;
@@ -75,22 +93,59 @@ var Container = React.createClass({
     }
   },
 
-  onDominantSpeakerChanged: function(resourceJid) {
+  changeDominantSpeaker: function(resourceJid) {
     if (resourceJid === APP.xmpp.myResource()) {
       return;
-    } else {
+    } else {      
       var newSpeaker = 'participant_' + resourceJid;
-      var newState = {dominantSpeaker: newSpeaker}
+      var newState = {dominantSpeaker: newSpeaker};
+
       if(this.state.participants[newSpeaker]) {
         newState.largeVideo = {userJid: resourceJid, stream: this.state.participants[newSpeaker].stream};
       }
+
       this.setState(newState);
     }
+  },
+
+  checkMediaFlowAttributes: function(jid, changedStreams) {
+
   },
 
   getLargeVideoState: function() {
     return this.state.largeVideo;
   },
+
+  addParticipant: function(jid, id, displayName) {
+    var newParticipant = {}
+    
+    newParticipant['participant_' + Strophe.getResourceFromJid(jid)] = {
+      jid: jid,
+      id: id,
+      displayName: displayName
+    };
+
+    this.setState({participants: _.assign(this.state.participants, newParticipant)});
+  },
+
+  changeParticipantName: function(jid, newName) {
+    if (jid === APP.xmpp.myJid()) {
+      return;
+    } else {
+      var participantId = 'participant_' + Strophe.getResourceFromJid(jid);  
+      var participant = {};
+
+      participant[participantId] = this.state.participants[participantId]
+      participant[participantId]['displayName'] = newName;
+
+      this.setState({participants: _.assign(this.state.participants, participant)});
+    }
+  },
+
+  deleteParticipant: function(jid) {
+    this.setState({participants: _.omit(this.state.participants, 
+      'participant_' + Strophe.getResourceFromJid(jid))});
+  }, 
 
   renderPresentation: function() {
     if(this.state.largeVideo.stream) {
