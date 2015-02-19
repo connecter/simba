@@ -10,7 +10,9 @@ window.config = require('../meetConfig');
 
 var APP = window.APP = {
   init: function () {
-    this.UI = require("./modules/UI")
+    this.UI = require("./modules/UI");
+    this.connectionquality = require("../meet/modules/connectionquality/connectionquality");
+        this.statistics = require("../meet/modules/statistics/statistics");
     this.RTC = require("../meet/modules/RTC/RTC");
     this.simulcast = require("../meet/modules/simulcast/simulcast");
     this.xmpp = require("../meet/modules/xmpp/xmpp");
@@ -18,6 +20,8 @@ var APP = window.APP = {
 
     APP.RTC.start();
     APP.xmpp.start({});
+    APP.statistics.start();
+    APP.connectionquality.init();
     APP.UI.start();
   }
 };
