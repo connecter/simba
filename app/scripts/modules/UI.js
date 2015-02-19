@@ -33,6 +33,29 @@ function registerListeners() {
   APP.UI.addListener(UIEvents.NICKNAME_CHANGED, onNicknameChanged);
 
   APP.xmpp.addListener(XMPPEvents.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
+
+
+  APP.RTC.addListener(RTCEvents.LASTN_CHANGED, function (lastNEndpoints, endpointsEnteringLastN, stream) {
+    console.log("LASTN_CHANGED");
+    console.log(arguments);
+  });
+
+  APP.RTC.addListener(RTCEvents.LASTN_ENDPOINT_CHANGED, function (lastNEndpoints, endpointsEnteringLastN, stream) {
+    console.log("LASTN_ENDPOINT_CHANGED");
+    console.log(arguments);
+  });
+
+  APP.RTC.addListener(RTCEvents.SIMULCAST_LAYER_CHANGED,
+    function (endpointSimulcastLayers) {
+    console.log("SIMULCAST_LAYER_CHANGED");
+    console.log(arguments);  
+  });
+
+  APP.RTC.addListener(RTCEvents.SIMULCAST_LAYER_CHANGING,
+    function (endpointSimulcastLayers) {
+    console.log("SIMULCAST_LAYER_CHANGING");
+    console.log(arguments);
+  });
 }
 
 function streamHandler(stream) {
