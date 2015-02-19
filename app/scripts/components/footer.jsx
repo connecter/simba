@@ -5,7 +5,6 @@ var React = require('react/addons');
 var Screenshare = require('./screenshare');
 
 var Footer = React.createClass({
-
   getInitialState: function() {
     return {isToolbarExpanded: false, isScreenshareOpen: false}
   },
@@ -19,7 +18,6 @@ var Footer = React.createClass({
   },
 
   render: function() {
-
     var cx = React.addons.classSet,
       toolbarClasses = cx({
         'is-expanded': this.state.isToolbarExpanded,
@@ -30,10 +28,27 @@ var Footer = React.createClass({
         'btn-arrow-left': this.state.isToolbarExpanded
       }),
 
-
       toggleButtonText = cx({
         'Show more': !this.state.isToolbarExpanded,
         'Show less': this.state.isToolbarExpanded
+      }),
+
+      videoButtonClasses = cx({
+        'is-toggled': this.props.callControlToggleStates.videoMute
+      }),
+
+      videoButtonText = cx({
+        'Turn video off': !this.props.callControlToggleStates.videoMute,
+        'Turn video on': this.props.callControlToggleStates.videoMute
+      }),
+
+      audioButtonClasses = cx({
+        'is-toggled': this.props.callControlToggleStates.micMute
+      }),
+
+      audioButtonText = cx({
+        'Turn mic off': !this.props.callControlToggleStates.micMute,
+        'Turn mic on': this.props.callControlToggleStates.micMute
       }),
 
       screenshareButtonClasses = cx({
@@ -54,10 +69,10 @@ var Footer = React.createClass({
             <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>
             <li><div className="vertical-seperator"></div></li>
           </ul>
-          <button className={"btn-icon " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>  
+          <button className={"btn-icon " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>
           <ul className="btn-group pull-right">
-            <li><button className="btn-icon btn-mic" title="Turn mic on"><span className="sr-only">Turn mic off</span></button></li>
-            <li><button className="btn-icon btn-camera" title="Turn video off"><span className="sr-only">Turn video off</span></button></li>
+            <li><button className={"btn-icon btn-mic " + audioButtonClasses} title={audioButtonText} onClick={this.props.execCommand("toggleAudio")}><span className="sr-only">{videoButtonText}</span></button></li>
+            <li><button className={"btn-icon btn-camera " + videoButtonClasses} title={videoButtonText} onClick={this.props.execCommand("toggleVideo")}><span className="sr-only">{videoButtonText}</span></button></li>
             <li><button className="btn-icon btn-lock" title="Lock this room"><span className="sr-only">Lock this room</span></button></li>
             <li><button className="btn-icon btn-end-call" title="End call"><span className="sr-only">End call</span></button></li>
           </ul>

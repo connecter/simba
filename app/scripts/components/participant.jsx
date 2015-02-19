@@ -12,8 +12,6 @@ var Participant = React.createClass({
 
   getInitialState: function () {
     var state = {};
-    console.log("Recieving props");
-    console.log(this.props);
     if(this.props.participant.stream.type=="Video") {
       state.video = this.props.participant.stream;
     } 
@@ -25,8 +23,6 @@ var Participant = React.createClass({
   },
 
   componentWillReceiveProps: function(newProps) {
-    console.log("Recieving new props");
-    console.log(newProps);
     var newState = {};
     if(newProps.participant.stream.type=="Video") {
       newState.video = newProps.participant.stream;
@@ -51,8 +47,6 @@ var Participant = React.createClass({
   },
 
   render: function() {
-    console.log("participant state")
-    console.log(this.state)
     return (
       <div className="participant">
         {this.renderAudio()}

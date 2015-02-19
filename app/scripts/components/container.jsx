@@ -11,7 +11,15 @@ var Header = require('./header'),
 
 var Container = React.createClass({
   getInitialState: function() {
-    return {participants: {}, largeVideo: {stream: null, userJid: null}, dominantSpeaker: null};
+    return {
+      participants: {},
+      largeVideo: {
+        stream: null,
+        userJid: null
+      },
+      dominantSpeaker: null,
+      callControlToggleStates: {}
+    };
   },
 
   changeLocalAudio: function(stream) {
@@ -27,16 +35,42 @@ var Container = React.createClass({
     this.setState(newState);
   },
 
-  onRemoteStreamAdded: function (stream) {    
+  toggleVideo: function() {
+    var that = this;
+
+    APP.xmpp.setVideoMute(!this.state.callControlToggleStates.videoMute, function() {
+      that.setState({callControlToggleStates: _.assign(that.state.callControlToggleStates,
+        {videoMute: !that.state.callControlToggleStates.videoMute})});
+    });
+  },
+
+  toggleAudio: function() {
+    var that = this;
+
+    APP.xmpp.setAudioMute(!this.state.callControlToggleStates.micMute, function() {
+      that.setState({callControlToggleStates: _.assign(that.state.callControlToggleStates,
+        {micMute: !that.state.callControlToggleStates.micMute})});
+    });
+  },
+
+  execCommand: function(command) {
+    var that = this;
+
+    return function() {
+      that[command]();
+    };
+  },
+
+  onRemoteStreamAdded: function (stream) {
     if (stream.peerjid) {
       var newParticipant = {}
       newParticipant['participant_' + Strophe.getResourceFromJid(stream.peerjid)] = {stream: stream}
       this.setState({participants: _.assign(this.state.participants, newParticipant)});
-    } else {  
+    } else {
       var id = stream.getOriginalStream().id;
       if (id !== 'mixedmslabel'&& id !== 'default') {
-        console.error('can not associate stream', id, 'with a participant'); 
-        return; 
+        console.error('can not associate stream', id, 'with a participant');
+        return;
       }
     }
   },
@@ -65,7 +99,7 @@ var Container = React.createClass({
       );
     }
   },
-  
+
   renderParticipants: function() {
     if(this.state.localAudio && this.state.localVideo) {
       return (<Participants participants={this.state.participants} local={{video:this.state.localVideo, audio: this.state.localAudio}}></Participants>)
@@ -79,7 +113,7 @@ var Container = React.createClass({
         {this.renderPresentation()}
         {this.renderParticipants()}
         <Discussions></Discussions>
-        <Footer></Footer>
+        <Footer execCommand={this.execCommand} callControlToggleStates={this.state.callControlToggleStates}></Footer>
       </div>
     );
   }
