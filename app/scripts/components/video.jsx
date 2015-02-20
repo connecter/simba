@@ -8,8 +8,10 @@ var Video = React.createClass({
     this.setup();
   },
 
-  componentDidUpdate: function() {
-    this.setup();
+  componentDidUpdate: function(prevProps) {
+    if(this.props.stream !== prevProps.stream) {
+      this.setup();
+    }
   },
 
   setup: function () {

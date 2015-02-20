@@ -8,16 +8,20 @@ var Presentation = React.createClass({
     this.setup();
   },
 
-  componentDidUpdate: function() {
-    this.setup();
+  componentDidUpdate: function(prevProps) {
+    if(this.props.stream !== prevProps.stream) {
+      this.setup();
+    }
   },
 
   componentWillUnmount: function() {
     this.cleanUp();
   },
 
-  componentWillUpdate: function() {
-    this.cleanUp();
+  componentWillUpdate: function(prevProps) {
+    if(this.props.stream !== prevProps.stream) {
+      this.setup();
+    }
   },
 
   setup: function () {

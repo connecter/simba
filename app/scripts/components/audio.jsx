@@ -8,10 +8,12 @@ var Audio = React.createClass({
     this.setup();
   },
 
-  componentDidUpdate: function() {
-    this.setup();
+  componentDidUpdate: function(prevProps) {
+    if(this.props.stream !== prevProps.stream) {
+      this.setup();
+    }
   },
-
+  
   setup: function () {
     var audioNode = this.refs.audio.getDOMNode();
     APP.RTC.attachMediaStream($(audioNode), this.props.stream.getOriginalStream());
