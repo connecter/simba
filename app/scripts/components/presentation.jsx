@@ -1,6 +1,6 @@
 "use strict";
 
-var React = require('react');
+var React = require('react/addons');
 
 var Presentation = React.createClass({
 
@@ -92,9 +92,13 @@ var Presentation = React.createClass({
   },
 
   render: function() {
+     var cx = React.addons.classSet;
+     var videoClasses = cx({
+      'flip-x': this.props.shouldFlipVideo
+    });
     return (
       <section className="presentation row" ref="videoSpace">
-        <video ref="largeVideo" autoPlay="true" className="flip-x"></video>
+        <video ref="largeVideo" autoPlay="true" className={videoClasses}></video>
       </section>
     );
   }

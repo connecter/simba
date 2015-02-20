@@ -34,7 +34,10 @@ var Container = React.createClass({
     var newState = {localVideo: stream};
 
     if(this.state.largeVideo.userJid===null) {
-      newState.largeVideo = {stream: stream, userJid: APP.xmpp.myResource()};
+      newState.largeVideo = {
+        stream: stream, 
+        userJid: "local"
+      };
     }
 
     this.setState(newState);
@@ -101,7 +104,11 @@ var Container = React.createClass({
       var newState = {dominantSpeaker: newSpeaker};
 
       if(this.state.participants[newSpeaker]) {
-        newState.largeVideo = {userJid: resourceJid, stream: this.state.participants[newSpeaker].stream};
+        newState.largeVideo = {
+          userResourceJid: resourceJid,
+          userJid: this.state.participants[newSpeaker].jid,
+          stream: this.state.participants[newSpeaker].stream
+        };
       }
 
       this.setState(newState);
@@ -145,12 +152,16 @@ var Container = React.createClass({
   deleteParticipant: function(jid) {
     this.setState({participants: _.omit(this.state.participants, 
       'participant_' + Strophe.getResourceFromJid(jid))});
+  },
+
+  shouldFlipVideo: function() {
+    return this.state.largeVideo.userJid === "local";
   }, 
 
   renderPresentation: function() {
     if(this.state.largeVideo.stream) {
       return (
-        <Presentation largeVideo={this.state.largeVideo.stream}></Presentation>
+        <Presentation largeVideo={this.state.largeVideo.stream} shouldFlipVideo={this.shouldFlipVideo()}></Presentation>
       );
     }
   },
