@@ -177,6 +177,14 @@ var Container = React.createClass({
       'participant_' + Strophe.getResourceFromJid(jid))});
   },
 
+  isParticipantActive: function(jid) {
+    if(jid==='local') {
+      return this.state.largeVideo.userJid === jid && this.state.localName && _.keys(this.state.participants).length > 0;
+    } else {
+      return this.state.largeVideo.userJid === jid;
+    }
+  },
+
   shouldFlipVideo: function() {
     return this.state.largeVideo.userJid === "local";
   }, 
@@ -191,7 +199,7 @@ var Container = React.createClass({
 
   renderParticipants: function() {
     if(this.state.localAudio && this.state.localVideo) {
-      return (<Participants participants={this.state.participants} local={{video:this.state.localVideo, audio: this.state.localAudio}}></Participants>)
+      return (<Participants participants={this.state.participants} local={{video: this.state.localVideo, audio: this.state.localAudio, displayName: this.state.localName}} isParticipantActive={this.isParticipantActive}></Participants>)
     }
   },
 

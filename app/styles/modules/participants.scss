@@ -3,6 +3,9 @@
   video {
     width: 100%;
   }
+
+  position: relative;
+  min-height: 80px;
 }
 
 .invite {
@@ -62,5 +65,34 @@
     height: 60px;
     margin: 0 20px;
     padding: 9px 0;
+  }
+}
+
+.participant-name-wrap {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  @extend .z-index-level_-1;
+
+  &.on-top {
+    @extend .z-index-level_1;
+  }
+}
+
+.participant-name {
+  background: #2D3036;
+  color: #2D3036;
+  font-size: 18px;
+  color: #fff;
+  display: table;
+  height: 100%;
+  width: 100%;
+  
+  span {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
   }
 }

@@ -1,8 +1,12 @@
 "use strict";
 
-var React = require('react');
+var React = require('react/addons');
 
 var Video = React.createClass({
+
+  propTypes: {
+    shouldFlipVideo: React.PropTypes.bool
+  },
 
   componentDidMount: function() {
     this.setup();
@@ -20,8 +24,13 @@ var Video = React.createClass({
   },
 
   render: function() {
+    var cx = React.addons.classSet;
+    var videoClasses = cx({
+      'flip-x': this.props.shouldFlipVideo
+    });
+    
     return (
-      <video ref="video" autoPlay="true"></video>
+      <video ref="video" className={videoClasses} autoPlay="true"></video>
     );
   }
 

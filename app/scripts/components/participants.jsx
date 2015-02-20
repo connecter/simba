@@ -9,19 +9,12 @@ var Invite = require("./invite"),
 var Participants = React.createClass({
   propTypes: {
     participants: React.PropTypes.object.isRequired,
-    local: React.PropTypes.object.isRequired
+    local: React.PropTypes.object.isRequired,
+    isParticipantActive: React.PropTypes.func.isRequired,
   },
 
   getInitialState: function() {
     return {collapsed: false, isInviteOpen: false};
-  },
-
-   componentDidMount: function () {
-    var localVideoNode = this.refs.localVideo.getDOMNode(),
-        localAudioNode = this.refs.localAudio.getDOMNode();
-    APP.RTC.attachMediaStream($(localAudioNode), this.props.local.audio.getOriginalStream());
-    APP.RTC.attachMediaStream($(localVideoNode), this.props.local.video.getOriginalStream());
-    localAudioNode.volume = 0;
   },
 
   handleToggle: function() {
@@ -33,10 +26,12 @@ var Participants = React.createClass({
   },
 
   renderParticipants: function() {
-    var participants = []
+    var participants = [];
+    var that = this;
+
     _.forEach(this.props.participants, function(participant, key) {
       participants.push(
-        <Participant participant={participant}  key={key} />
+        <Participant participant={participant}  key={key} isActive={that.props.isParticipantActive(participant.jid)} />
       )
     });
     return participants;
@@ -53,8 +48,7 @@ var Participants = React.createClass({
           <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         <div className="participant">
-          <video ref="localVideo" autoPlay="true" className="flip-x"></video>
-          <audio ref="localAudio" autoPlay="true"></audio>
+          <Participant participant={this.props.local} local={true} isActive={this.props.isParticipantActive('local')} />
         </div>
         {this.renderParticipants()}
         <Invite isInviteOpen={this.state.isInviteOpen} toggleInviteBox={this.toggleInviteBox} />

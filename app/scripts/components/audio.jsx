@@ -3,6 +3,9 @@
 var React = require('react');
 
 var Audio = React.createClass({
+  propTypes: {
+    muteAudio: React.PropTypes.bool
+  },
 
   componentDidMount: function() {
     this.setup();
@@ -13,10 +16,13 @@ var Audio = React.createClass({
       this.setup();
     }
   },
-  
+
   setup: function () {
     var audioNode = this.refs.audio.getDOMNode();
     APP.RTC.attachMediaStream($(audioNode), this.props.stream.getOriginalStream());
+    if (this.props.muteAudio) {
+      audioNode.volume = 0;
+    };
   },
 
   render: function() {
