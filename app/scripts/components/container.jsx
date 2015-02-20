@@ -69,6 +69,14 @@ var Container = React.createClass({
     });
   },
 
+  hangup: function() {
+    APP.xmpp.disposeConference();
+    APP.UI.messageHandler.openDialog(
+      "Session Terminated",
+      "You hung up the call. Refresh the browser to join again"
+    );
+  },
+
   execCommand: function(command) {
     var that = this;
 

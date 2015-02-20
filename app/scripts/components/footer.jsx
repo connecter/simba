@@ -78,7 +78,7 @@ var Footer = React.createClass({
             <li><button className={"btn-icon btn-mic " + audioButtonClasses} title={audioButtonText} onClick={this.props.execCommand("toggleAudio")}><span className="sr-only">{videoButtonText}</span></button></li>
             <li><button className={"btn-icon btn-camera " + videoButtonClasses} title={videoButtonText} onClick={this.props.execCommand("toggleVideo")}><span className="sr-only">{videoButtonText}</span></button></li>
             <li><button className="btn-icon btn-lock" title="Lock this room"><span className="sr-only">Lock this room</span></button></li>
-            <li><button className="btn-icon btn-end-call" title="End call"><span className="sr-only">End call</span></button></li>
+            <li><button className="btn-icon btn-end-call" title="End call" onClick={this.props.execCommand("hangup")}><span className="sr-only">End call</span></button></li>
           </ul>
           <div className="clearfix"></div>
         </footer>
