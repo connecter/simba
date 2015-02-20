@@ -103,7 +103,7 @@ var Container = React.createClass({
       var newSpeaker = 'participant_' + resourceJid;
       var newState = {dominantSpeaker: newSpeaker};
 
-      if(this.state.participants[newSpeaker]) {
+      if(this.state.participants[newSpeaker] && !this.state.participants[newSpeaker].videoMute) {
         newState.largeVideo = {
           userResourceJid: resourceJid,
           userJid: this.state.participants[newSpeaker].jid,
@@ -116,7 +116,30 @@ var Container = React.createClass({
   },
 
   checkMediaFlowAttributes: function(jid, changedStreams) {
+    if (jid === APP.xmpp.myJid()) {
+      return;
+    } else {
+      var that = this;
+          var participantId = 'participant_' + Strophe.getResourceFromJid(jid);  
+          var participant = {};
+          participant[participantId] = that.state.participants[participantId] || {};
 
+      _.forEach(changedStreams, function(stream) {
+        if(stream.type === 'video' || stream.type === 'screen') {
+
+          switch (stream.direction) {
+            case 'sendrecv':
+              participant[participantId].videoMute = false;
+              that.setState({participants: _.assign(that.state.participants, participant)});
+              break;
+            case 'recvonly':
+              participant[participantId].videoMute = true;
+              that.setState({participants: _.assign(that.state.participants, participant)});
+              break;
+          }
+        }
+      });
+    }
   },
 
   getLargeVideoState: function() {
@@ -142,7 +165,7 @@ var Container = React.createClass({
       var participantId = 'participant_' + Strophe.getResourceFromJid(jid);  
       var participant = {};
 
-      participant[participantId] = this.state.participants[participantId]
+      participant[participantId] = this.state.participants[participantId] || {};
       participant[participantId]['displayName'] = newName;
 
       this.setState({participants: _.assign(this.state.participants, participant)});
