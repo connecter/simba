@@ -1,4 +1,4 @@
-$buttons-list: "add", "arrow-left", "arrow-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo";
+$buttons-list: "add", "arrow-left", "arrow-right", "arrow-small-left", "arrow-small-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo";
 
 $buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "snapshot", "text", "camera";
 
@@ -78,5 +78,15 @@ $primary-button-bg: #3bafda;
   li {
     display: inline-block;
     margin-left: 8px;
+  }
+}
+
+.btn-icon {
+  &.btn-screenshare {
+    width: 75px;
+  }
+
+  &.btn-arrow-small-left, &.btn-arrow-small-right {
+    width: 33px
   }
 }

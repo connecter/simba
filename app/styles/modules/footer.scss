@@ -1,12 +1,16 @@
 .toolbar {
-  width:106px;
+  width:180px;
   height: 40px;
   overflow: hidden;
   transition: all 0.2s linear; 
 
   
   &.is-expanded {
-    width: 300px;
+    width: 435px;
+  }
+
+  .btn-screenshare {
+    margin-right: 40px;
   }
 }
 

@@ -24,8 +24,12 @@ var Footer = React.createClass({
       }),
 
       toggleButtonClasses = cx({
-        'btn-arrow-right': !this.state.isToolbarExpanded,
-        'btn-arrow-left': this.state.isToolbarExpanded
+        'btn-arrow-small-right': !this.state.isToolbarExpanded,
+        'btn-arrow-small-left': this.state.isToolbarExpanded
+      }),
+
+      toggleVerticalSeperatorClasses = cx({
+        'vertical-seperator': this.state.isToolbarExpanded
       }),
 
       toggleButtonText = cx({
@@ -67,9 +71,9 @@ var Footer = React.createClass({
             <li><button className="btn-icon btn-undo" title="Undo"><span className="sr-only">Undo</span></button></li>
             <li><button className="btn-icon btn-clear" title="Clear"><span className="sr-only">Clear</span></button></li>
             <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>
-            <li><div className="vertical-seperator"></div></li>
           </ul>
-          <button className={"btn-icon " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>
+          <button className={"btn-icon pull-left " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>
+          <div className={"pull-left " + toggleVerticalSeperatorClasses}></div>
           <ul className="btn-group pull-right">
             <li><button className={"btn-icon btn-mic " + audioButtonClasses} title={audioButtonText} onClick={this.props.execCommand("toggleAudio")}><span className="sr-only">{videoButtonText}</span></button></li>
             <li><button className={"btn-icon btn-camera " + videoButtonClasses} title={videoButtonText} onClick={this.props.execCommand("toggleVideo")}><span className="sr-only">{videoButtonText}</span></button></li>
