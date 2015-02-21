@@ -1,11 +1,19 @@
 .participant {
-  margin-bottom: 12px;
+  position: relative;
+  min-height: 80px;
+  margin-bottom: 12px;  
   video {
     width: 100%;
   }
 
-  position: relative;
-  min-height: 80px;
+  canvas {
+    left: 0;
+    right: 0;
+    top: -10px;
+    bottom: 0;
+    position: absolute;
+    @extend .z-index-level_2;
+  }
 }
 
 .invite {

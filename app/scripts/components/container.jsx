@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react'),
-    _ = require('lodash');;
+    _ = require('lodash');
 
 var Header = require('./header'),
     Footer = require('./footer'),
@@ -185,12 +185,33 @@ var Container = React.createClass({
       'participant_' + Strophe.getResourceFromJid(jid))});
   },
 
+  updateAudioLevel: function(jid, audioLevel) {
+    if (jid === APP.xmpp.myJid() || jid === 'local') {
+      if(this.state.callControlToggleStates.micMute) {
+        this.setState({localAudioLevel: 0});
+      } else {
+        this.setState({localAudioLevel: audioLevel});
+      }
+    } else {
+      var participantId = 'participant_' + Strophe.getResourceFromJid(jid);  
+      var participant = {};
+      
+      if(this.state.participants[participantId]) {
+        participant[participantId] = this.state.participants[participantId];
+        participant[participantId].audioLevel = audioLevel;
+
+        this.setState({participants: _.assign(this.state.participants, participant)});
+      }
+    }
+  },
+
   isParticipantActive: function(jid) {
-    if(jid==='local') {
-      return this.state.largeVideo.userJid === jid && this.state.localName && _.keys(this.state.participants).length > 0;
+    if (jid === APP.xmpp.myJid() || jid === 'local') {
+      return this.state.localName && this.state.largeVideo.userJid === jid && _.keys(this.state.participants).length > 0;
     } else {
       return this.state.largeVideo.userJid === jid;
     }
+    return false;
   },
 
   shouldFlipVideo: function() {
@@ -207,7 +228,7 @@ var Container = React.createClass({
 
   renderParticipants: function() {
     if(this.state.localAudio && this.state.localVideo) {
-      return (<Participants participants={this.state.participants} local={{video: this.state.localVideo, audio: this.state.localAudio, displayName: this.state.localName}} isParticipantActive={this.isParticipantActive}></Participants>)
+      return (<Participants participants={this.state.participants} local={{video: this.state.localVideo, audio: this.state.localAudio, displayName: this.state.localName, audioLevel: this.state.localAudioLevel}} isParticipantActive={this.isParticipantActive}></Participants>)
     }
   },
 

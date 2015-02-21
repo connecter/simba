@@ -2,8 +2,9 @@
 
 var React = require('react/addons');
 
-var Video = require("./video.jsx")
-var Audio = require("./audio.jsx");
+var Video = require("./video.jsx"),
+    Audio = require("./audio.jsx"),
+    AudioLevel = require("./audioLevel.jsx");
 
 var Participant = React.createClass({
   propTypes: {
@@ -69,6 +70,12 @@ var Participant = React.createClass({
     }
   },
 
+  renderAudioLevel: function() {
+    if(this.props.participant.audioLevel) {
+      return <AudioLevel audioLevel={this.props.participant.audioLevel} />
+    }
+  },
+
   render: function() {
     var cx = React.addons.classSet;
     var participantNameClasses = cx({
@@ -79,6 +86,7 @@ var Participant = React.createClass({
       <div className="participant">
         {this.renderAudio()}
         {this.renderVideo()}
+        {this.renderAudioLevel()}
         <div className={"participant-name-wrap " + participantNameClasses}>
           <div className="participant-name">
             <span>{this.props.participant.displayName}</span>

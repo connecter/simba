@@ -34,7 +34,6 @@ function registerListeners() {
 
   APP.xmpp.addListener(XMPPEvents.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
 
-
   APP.RTC.addListener(RTCEvents.LASTN_CHANGED, function (lastNEndpoints, endpointsEnteringLastN, stream) {
     console.log("LASTN_CHANGED");
     console.log(arguments);
@@ -56,6 +55,8 @@ function registerListeners() {
     console.log("SIMULCAST_LAYER_CHANGING");
     console.log(arguments);
   });
+
+  APP.statistics.addAudioLevelListener(audioLevelHandler);
 }
 
 function streamHandler(stream) {
@@ -106,6 +107,10 @@ function onNicknameChanged(nickname) {
 
 function onDisplayNameChanged(jid, displayName) {
   View.changeParticipantName(jid, displayName);
+}
+
+function audioLevelHandler(jid, audioLevel) {
+  View.updateAudioLevel(jid, audioLevel);
 }
 
 UI.start = function() {
