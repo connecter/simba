@@ -13,60 +13,15 @@ var Participant = React.createClass({
     isActive: React.PropTypes.bool,
   },
 
-  getInitialState: function () {
-    var state = {};
-    if(this.props.participant.stream) {
-      if(this.props.participant.stream.type=="Video") {
-        state.video = this.props.participant.stream;
-      } 
-
-      if(this.props.participant.stream.type=="Audio") {
-        state.audio = this.props.participant.stream;
-      }
-    } else {
-      if(this.props.participant.video) {
-        state.video = this.props.participant.video
-      }
-
-      if(this.props.participant.audio) {
-        state.audio = this.props.participant.audio
-      }
-    }
-    return state;
-  },
-
-  componentWillReceiveProps: function(newProps) {
-    var newState = {};
-    if(newProps.participant.stream) {
-      if(newProps.participant.stream.type=="Video") {
-        newState.video = newProps.participant.stream;
-      }
-
-      if(newProps.participant.stream.type=="Audio") {
-        newState.audio = newProps.participant.stream;
-      }
-    } else {
-      if(this.props.participant.video) {
-        newState.video = this.props.participant.video
-      }
-
-      if(this.props.participant.audio) {
-        newState.audio = this.props.participant.audio
-      }
-    }
-
-    this.setState(newState);
-  },
-
   renderVideo: function() {
-    if(this.state.video) {
-      return <Video stream={this.state.video} shouldFlipVideo={this.props.local}/>
+    if(this.props.participant.video) {
+      return <Video stream={this.props.participant.video} shouldFlipVideo={this.props.local}/>
     }
   },
 
   renderAudio: function() {
-    if(this.state.audio) {
-      return <Audio stream={this.state.audio} muteAudio={this.props.local}/>;
+    if(this.props.participant.audio) {
+      return <Audio stream={this.props.participant.audio} muteAudio={this.props.local}/>;
     }
   },
 

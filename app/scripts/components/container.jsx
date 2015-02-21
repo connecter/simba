@@ -92,6 +92,14 @@ var Container = React.createClass({
 
       participant[participantId] = this.state.participants[participantId] || {}
       participant[participantId]['stream'] = stream; 
+      
+      if(stream.type=="Video") {
+        participant[participantId].video = stream;
+      } 
+
+      if(stream.type=="Audio") {
+        participant[participantId].audio = stream;
+      }
 
       this.setState({participants: _.assign(this.state.participants, participant)});
     } else {
@@ -115,7 +123,7 @@ var Container = React.createClass({
         newState.largeVideo = {
           userResourceJid: resourceJid,
           userJid: this.state.participants[newSpeaker].jid,
-          stream: this.state.participants[newSpeaker].stream
+          stream: this.state.participants[newSpeaker].video
         };
       }
 
