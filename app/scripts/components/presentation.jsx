@@ -9,7 +9,7 @@ var Presentation = React.createClass({
   },
 
   componentDidUpdate: function(prevProps) {
-    if(this.props.stream !== prevProps.stream) {
+    if(this.props.largeVideo !== prevProps.largeVideo) {
       this.setup();
     }
   },
@@ -19,7 +19,7 @@ var Presentation = React.createClass({
   },
 
   componentWillUpdate: function(prevProps) {
-    if(this.props.stream !== prevProps.stream) {
+    if(this.props.largeVideo !== prevProps.largeVideo) {
       this.setup();
     }
   },
