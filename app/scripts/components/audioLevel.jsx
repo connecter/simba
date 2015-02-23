@@ -21,6 +21,9 @@ var audioLevel = React.createClass({
         shadowLevel = this.getShadowLevel(parentHeight, this.props.audioLevel),
         that = this;
     
+    canvas.height = parentHeight + 20;
+    canvas.width = parentWidth + 20;
+    
     drawContext.clearRect(0, 0, canvas.width, canvas.width);
 
     if (shadowLevel > 0) {
@@ -57,7 +60,7 @@ var audioLevel = React.createClass({
 
   render: function() {
     return (
-      <canvas ref="audioLevelCanvas" className="audio-level" />
+      <canvas ref="audioLevelCanvas" className="audio-level" width="150"/>
     );
   }
 });

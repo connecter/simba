@@ -11,6 +11,7 @@ var Participants = React.createClass({
     participants: React.PropTypes.object.isRequired,
     local: React.PropTypes.object.isRequired,
     isParticipantActive: React.PropTypes.func.isRequired,
+    isParticipantPinned: React.PropTypes.func.isRequired,
   },
 
   getInitialState: function() {
@@ -31,7 +32,13 @@ var Participants = React.createClass({
 
     _.forEach(this.props.participants, function(participant, key) {
       participants.push(
-        <Participant participant={participant}  key={key} isActive={that.props.isParticipantActive(participant.jid)} />
+        <Participant
+          participant={participant}
+          key={key}
+          isActive={that.props.isParticipantActive(participant.jid)}
+          isPinned={that.props.isParticipantPinned(participant.jid)} 
+          pinParticipant={that.props.pinParticipant} 
+        />
       )
     });
     return participants;
@@ -48,7 +55,13 @@ var Participants = React.createClass({
           <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         <div className="participant">
-          <Participant participant={this.props.local} local={true} isActive={this.props.isParticipantActive('local')} />
+          <Participant 
+            participant={this.props.local}
+            local={true}
+            isActive={this.props.isParticipantActive('local')}
+            isPinned={this.props.isParticipantPinned('local')} 
+            pinParticipant={this.props.pinParticipant}  
+          />
         </div>
         {this.renderParticipants()}
         <Invite isInviteOpen={this.state.isInviteOpen} toggleInviteBox={this.toggleInviteBox} />

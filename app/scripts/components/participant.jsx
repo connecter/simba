@@ -10,7 +10,13 @@ var Participant = React.createClass({
   propTypes: {
     participant: React.PropTypes.object.isRequired,
     local: React.PropTypes.bool,
+    pinParticipant: React.PropTypes.func.isRequired,
+    isPinned: React.PropTypes.bool,
     isActive: React.PropTypes.bool,
+  },
+
+  onClickHandler: function() {
+    this.props.pinParticipant(this.props.participant.jid);
   },
 
   renderVideo: function() {
@@ -33,18 +39,22 @@ var Participant = React.createClass({
 
   render: function() {
     var cx = React.addons.classSet;
-    var participantNameClasses = cx({
-      'on-top': this.props.isActive
-    });
+    var participantClasses = cx({
+          'is-pinned': this.props.isPinned
+        }),  
+        
+        participantNameClasses = cx({
+          'on-top': this.props.isActive
+        });
 
     return (
-      <div className="participant">
+      <div className={"participant " + participantClasses} onClick={this.onClickHandler}>
         {this.renderAudio()}
         {this.renderVideo()}
         {this.renderAudioLevel()}
         <div className={"participant-name-wrap " + participantNameClasses}>
           <div className="participant-name">
-            <span>{this.props.participant.displayName || this.props.participant.jid==='local'? 'You' : 'Someone'}</span>
+            <span>{this.props.participant.displayName || (this.props.local ? 'You' : 'Someone')}</span>
           </div>
         </div>
       </div>  

@@ -18,7 +18,6 @@ var Container = React.createClass({
         userJid: null
       },
       local: {jid:'local'},
-      dominantSpeaker: null,
       callControlToggleStates: {}
     };
   },
@@ -43,10 +42,7 @@ var Container = React.createClass({
     newState.local.video = stream;
 
     if(this.state.largeVideo.userJid===null) {
-      newState.largeVideo = {
-        stream: stream, 
-        userJid: "local"
-      };
+      this.changeLargeVideoTo(newState.local);
     }
 
     this.setState(newState);
@@ -56,6 +52,18 @@ var Container = React.createClass({
       
       newState.video = null;
       this.setState({local: newState});
+    }
+  },
+  
+  changeLargeVideoTo: function(participant) {
+    if(!participant.videoMute) {
+      var newState = {}
+
+      newState.largeVideo = {
+        userJid: participant.jid,
+        stream: participant.video
+      }
+      this.setState(newState);
     }
   },
 
@@ -135,17 +143,11 @@ var Container = React.createClass({
       return;
     } else {      
       var newSpeaker = 'participant_' + resourceJid;
-      var newState = {dominantSpeaker: newSpeaker};
 
-      if(this.state.participants[newSpeaker] && !this.state.participants[newSpeaker].videoMute) {
-        newState.largeVideo = {
-          userResourceJid: resourceJid,
-          userJid: this.state.participants[newSpeaker].jid,
-          stream: this.state.participants[newSpeaker].video
-        };
+      if(this.state.participants[newSpeaker] && !this.state.pinnedParticipant) {
+        this.changeLargeVideoTo(this.state.participants[newSpeaker]);
+        this.setState({dominantSpeaker: newSpeaker});
       }
-
-      this.setState(newState);
     }
   },
 
@@ -236,13 +238,37 @@ var Container = React.createClass({
     }
   },
 
+  pinParticipant: function(jid) {
+    if(this.state.pinnedParticipant === jid) {
+      this.setState({pinnedParticipant: null});
+      if(this.state.dominantSpeaker && this.state.participants[this.state.dominantSpeaker]) {
+        this.changeLargeVideoTo(this.state.participants[this.state.dominantSpeaker]);
+      }
+    } 
+    else if(jid==='local') {
+      this.changeLargeVideoTo(this.state.local);
+      this.setState({pinnedParticipant: 'local'});
+    } 
+    else {
+      var participantId = 'participant_' + Strophe.getResourceFromJid(jid);
+
+      if(this.state.participants[participantId]) {
+        this.changeLargeVideoTo(this.state.participants[participantId]);
+        this.setState({pinnedParticipant: jid});
+      }
+    }
+  },
+
   isParticipantActive: function(jid) {
-    if (jid === APP.xmpp.myJid() || jid === 'local') {
+    if (jid === 'local') {
       return this.state.localName && this.state.largeVideo.userJid === jid && _.keys(this.state.participants).length > 0;
     } else {
       return this.state.largeVideo.userJid === jid;
     }
-    return false;
+  },
+
+  isParticipantPinned: function(jid) {
+    return this.state.pinnedParticipant === jid;
   },
 
   shouldFlipVideo: function() {
@@ -258,7 +284,13 @@ var Container = React.createClass({
   },
 
   renderParticipants: function() {
-    return (<Participants participants={this.state.participants} local={this.state.local} isParticipantActive={this.isParticipantActive} pinParticipant={this.pinParticipant}></Participants>)
+    return (<Participants 
+              participants={this.state.participants}
+              local={this.state.local}
+              isParticipantActive={this.isParticipantActive}
+              isParticipantPinned={this.isParticipantPinned}
+              pinParticipant={this.pinParticipant}
+            ></Participants>)
   },
 
   render: function() {
