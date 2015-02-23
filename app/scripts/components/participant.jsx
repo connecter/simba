@@ -44,7 +44,7 @@ var Participant = React.createClass({
         {this.renderAudioLevel()}
         <div className={"participant-name-wrap " + participantNameClasses}>
           <div className="participant-name">
-            <span>{this.props.participant.displayName}</span>
+            <span>{this.props.participant.displayName || this.props.participant.jid==='local'? 'You' : 'Someone'}</span>
           </div>
         </div>
       </div>  

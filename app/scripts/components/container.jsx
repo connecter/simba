@@ -17,21 +17,30 @@ var Container = React.createClass({
         stream: null,
         userJid: null
       },
+      local: {jid:'local'},
       dominantSpeaker: null,
       callControlToggleStates: {}
     };
   },
 
   changeLocalAudio: function(stream) {
-    this.setState({localAudio: stream});
+    var newLocal = this.state.local
+        
+    newLocal.audio = stream;
+    this.setState({local: newLocal});
 
     stream.getOriginalStream().onended = function() {
-      this.setState({localAudio: null});
+      var newLocal = this.state.local;
+
+      newLocal.audio = null;
+      this.setState({local: newLocal});
     }
   },
 
   changeLocalVideo: function(stream) {
-    var newState = {localVideo: stream};
+    var newState = {local:this.state.local}
+   
+    newState.local.video = stream;
 
     if(this.state.largeVideo.userJid===null) {
       newState.largeVideo = {
@@ -43,20 +52,29 @@ var Container = React.createClass({
     this.setState(newState);
 
     stream.getOriginalStream().onended = function() {
-      this.setState({localVideo: null});
+      var newState = this.state.local;
+      
+      newState.video = null;
+      this.setState({local: newState});
     }
   },
 
   setLocalName: function(nickname) {
-    this.setState({localName: nickname});
+    var newLocal = this.state.local
+        
+    newLocal.displayName = nickname;
+    this.setState({local: newLocal});
   },
 
   toggleVideo: function() {
     var that = this;
 
     APP.xmpp.setVideoMute(!this.state.callControlToggleStates.videoMute, function() {
+      var newLocal = this.state.local;
+    
+      newLocal.videoMute = !that.state.callControlToggleStates.videoMute;
       that.setState({callControlToggleStates: _.assign(that.state.callControlToggleStates,
-        {videoMute: !that.state.callControlToggleStates.videoMute})});
+        {videoMute: !that.state.callControlToggleStates.videoMute}), local:newLocal});
     });
   },
 
@@ -195,12 +213,17 @@ var Container = React.createClass({
 
   updateAudioLevel: function(jid, audioLevel) {
     if (jid === APP.xmpp.myJid() || jid === 'local') {
+      var newLocal = this.state.local;
+
       if(this.state.callControlToggleStates.micMute) {
-        this.setState({localAudioLevel: 0});
+        newLocal.audioLevel = 0;
       } else {
-        this.setState({localAudioLevel: audioLevel});
+        newLocal.audioLevel = audioLevel;
       }
-    } else {
+
+      this.setState({local: newLocal});
+    } 
+    else {
       var participantId = 'participant_' + Strophe.getResourceFromJid(jid);  
       var participant = {};
       
@@ -235,9 +258,7 @@ var Container = React.createClass({
   },
 
   renderParticipants: function() {
-    if(this.state.localAudio && this.state.localVideo) {
-      return (<Participants participants={this.state.participants} local={{video: this.state.localVideo, audio: this.state.localAudio, displayName: this.state.localName, audioLevel: this.state.localAudioLevel}} isParticipantActive={this.isParticipantActive}></Participants>)
-    }
+    return (<Participants participants={this.state.participants} local={this.state.local} isParticipantActive={this.isParticipantActive} pinParticipant={this.pinParticipant}></Participants>)
   },
 
   render: function() {
