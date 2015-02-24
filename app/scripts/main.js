@@ -22,6 +22,7 @@ var APP = window.APP = {
     APP.xmpp.start({});
     APP.statistics.start();
     APP.connectionquality.init();
+    APP.desktopsharing.init();
     APP.UI.start();
   }
 };

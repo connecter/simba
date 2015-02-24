@@ -11,6 +11,7 @@ proxyOptions.route = '/http-bind/';
 gulp.task('browserSync', function() {
   browserSync({
     server: {
+      https: true,
       baseDir: config.root,
       middleware: [
         modRewrite(['^/([a-zA-Z0-9]+)$ /index.html']),

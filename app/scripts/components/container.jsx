@@ -23,45 +23,47 @@ var Container = React.createClass({
   },
 
   changeLocalAudio: function(stream) {
-    var newLocal = this.state.local
+    var newLocal = this.state.local,
+        that = this;
         
     newLocal.audio = stream;
     this.setState({local: newLocal});
 
     stream.getOriginalStream().onended = function() {
-      var newLocal = this.state.local;
+      var newLocal = that.state.local;
 
       newLocal.audio = null;
-      this.setState({local: newLocal});
+      that.setState({local: newLocal});
     }
   },
 
   changeLocalVideo: function(stream) {
-    var newState = {local:this.state.local}
-   
-    newState.local.video = stream;
+    var newState = {local:this.state.local},
+        that = this;
 
-    if(this.state.largeVideo.userJid===null) {
-      this.changeLargeVideoTo(newState.local);
+    newState.local[stream.videoType] = stream;
+
+    if(this.state.largeVideo.userJid===null || this.state.largeVideo.userJid==='local') {
+      var isScreen = (stream.videoType==='screen')
+      this.changeLargeVideoTo(newState.local, isScreen);
     }
 
     this.setState(newState);
 
     stream.getOriginalStream().onended = function() {
-      var newState = this.state.local;
+      var newState =that.state.local;
       
-      newState.video = null;
-      this.setState({local: newState});
+      newState[stream.videoType] = null;
+     that.setState({local: newState});
     }
   },
   
-  changeLargeVideoTo: function(participant) {
-    if(!participant.videoMute) {
+  changeLargeVideoTo: function(participant, toScreen) {
+    if(!participant.videoMute || toScreen) {
       var newState = {}
-
       newState.largeVideo = {
         userJid: participant.jid,
-        stream: participant.video
+        stream: participant[toScreen ? 'screen' : 'video']
       }
       this.setState(newState);
     }
@@ -95,6 +97,12 @@ var Container = React.createClass({
     });
   },
 
+  toggleScreenshare: function() {
+     APP.desktopsharing.toggleScreenSharing();
+     this.setState({callControlToggleStates: _.assign(this.state.callControlToggleStates,
+        {screenStream: !this.state.callControlToggleStates.screenStream})});
+  },
+
   hangup: function() {
     APP.xmpp.disposeConference();
     APP.UI.messageHandler.openDialog(
@@ -112,22 +120,49 @@ var Container = React.createClass({
   },
 
   addStream: function (stream) {
+    var that = this,
+        findVideoType = function() {
+          window.setTimeout(function() {
+            if(stream.videoType) {
+              participant[participantId][stream.videoType] = stream;
+              that.setState({participants: _.assign(that.state.participants, participant)});
+
+              if(that.isParticipantActive(Strophe.getResourceFromJid(stream.peerjid))) {
+                that.changeLargeVideoTo(this.state.participants[newSpeaker], (stream.videoType==='screen'));
+              }
+
+              stream.getOriginalStream().onended = function() {
+                participant[participantId][stream.videoType] = null;
+                that.setState({participants: _.assign(that.state.participants, participant)});                
+              }
+            } else {
+              findVideoType();
+            }
+          }, 0);
+        }
+
     if (stream.peerjid) {
-      var participantId = 'participant_' + Strophe.getResourceFromJid(stream.peerjid);
-      var participant = {};
+      var participantId = 'participant_' + Strophe.getResourceFromJid(stream.peerjid),
+          participant = {},
+          that = this;
 
       participant[participantId] = this.state.participants[participantId] || {}
-      participant[participantId]['stream'] = stream; 
       
-      if(stream.type=="Video") {
-        participant[participantId].video = stream;
+      if(stream.type==="Video") {
+        if(stream.videoType) {
+          participant[participantId][stream.videoType] = stream;
+          this.setState({participants: _.assign(that.state.participants, participant)});
+        } else {
+          findVideoType();
+        }
       } 
 
       if(stream.type=="Audio") {
         participant[participantId].audio = stream;
+        this.setState({participants: _.assign(that.state.participants, participant)});
       }
 
-      this.setState({participants: _.assign(this.state.participants, participant)});
+
     } else {
       var id = stream.getOriginalStream().id;
 
@@ -145,7 +180,7 @@ var Container = React.createClass({
       var newSpeaker = 'participant_' + resourceJid;
 
       if(this.state.participants[newSpeaker] && !this.state.pinnedParticipant) {
-        this.changeLargeVideoTo(this.state.participants[newSpeaker]);
+        this.changeLargeVideoTo(this.state.participants[newSpeaker], this.state.participants[newSpeaker].screen);
         this.setState({dominantSpeaker: newSpeaker});
       }
     }
@@ -253,7 +288,7 @@ var Container = React.createClass({
       var participantId = 'participant_' + Strophe.getResourceFromJid(jid);
 
       if(this.state.participants[participantId]) {
-        this.changeLargeVideoTo(this.state.participants[participantId]);
+        this.changeLargeVideoTo(this.state.participants[participantId], this.state.participants[participantId].screen);
         this.setState({pinnedParticipant: jid});
       }
     }
@@ -272,7 +307,7 @@ var Container = React.createClass({
   },
 
   shouldFlipVideo: function() {
-    return this.state.largeVideo.userJid === "local";
+    return this.state.largeVideo.userJid === "local" && this.state.largeVideo.stream.videoType !='screen';
   }, 
 
   renderPresentation: function() {

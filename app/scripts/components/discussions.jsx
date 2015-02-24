@@ -33,15 +33,15 @@ var Discussions = React.createClass({
     var cx = React.addons.classSet,
 
         containerClasses = cx({
-          'is-collapsed': this.state.collapsed,
+          'is-collapsed': this.state.collapsed
         }),
 
         chatButtonClasses = cx({
-          'is-toggled': this.state.current_opened === "chat",
+          'is-toggled': this.state.current_opened === "chat"
         }),
 
         notesButtonClasses = cx({
-          'is-toggled': this.state.current_opened === "notes",
+          'is-toggled': this.state.current_opened === "notes"
         });
 
     return (

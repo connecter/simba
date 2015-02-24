@@ -13,10 +13,6 @@ var Footer = React.createClass({
     this.setState({isToolbarExpanded: !this.state.isToolbarExpanded});
   },
 
-  toggleScreenshare: function() {
-    this.setState({isScreenshareOpen: !this.state.isScreenshareOpen});
-  },
-
   render: function() {
     var cx = React.addons.classSet,
       toolbarClasses = cx({
@@ -56,14 +52,19 @@ var Footer = React.createClass({
       }),
 
       screenshareButtonClasses = cx({
-        'is-toggled': this.state.isScreenshareOpen
+        'is-toggled': this.props.callControlToggleStates.screenStream
+      }),
+
+      screenshareText = cx({
+        'Share screen': !this.props.callControlToggleStates.screenStream,
+        'Turn screen sharing off': this.props.callControlToggleStates.screenStream
       });
 
     return (
       <div>
         <footer className="row">
           <ul className={"toolbar btn-group pull-left " + toolbarClasses}>
-            <li><button className={"btn-icon btn-screenshare " + screenshareButtonClasses} onClick={this.toggleScreenshare} title="Share my screen"><span className="sr-only">Share my screen</span></button></li>
+            <li><button className={"btn-icon btn-screenshare " + screenshareButtonClasses} onClick={this.props.execCommand("toggleScreenshare")} title={screenshareText}><span className="sr-only">{screenshareText}</span></button></li>
             <li><div className="vertical-seperator"></div></li>
             <li><button className="btn-icon btn-cursor" title="Show my cursor to participants"><span className="sr-only">Show my cursor to participants</span></button></li>
             <li><button className="btn-icon btn-pen" title="Draw on screen"><span className="sr-only">Draw on screen</span></button></li>
@@ -82,7 +83,6 @@ var Footer = React.createClass({
           </ul>
           <div className="clearfix"></div>
         </footer>
-        <Screenshare isOpen={this.state.isScreenshareOpen} />
       </div>
     );
   }
