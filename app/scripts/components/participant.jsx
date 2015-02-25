@@ -20,8 +20,8 @@ var Participant = React.createClass({
   },
 
   renderVideo: function() {
-    if(this.props.participant.video) {
-      return <Video stream={this.props.participant.video} shouldFlipVideo={this.props.local}/>
+    if(this.props.participant.video && !this.props.participant.isScreen) {
+      return <Video stream={this.props.participant.video} shouldFlipVideo={this.props.local && !this.props.participant.isScreen} />
     }
   },
 
@@ -40,7 +40,8 @@ var Participant = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
     var participantClasses = cx({
-          'is-pinned': this.props.isPinned
+          'is-pinned': this.props.isPinned,
+          'is-screenshare': this.props.participant.isScreen
         }),  
         
         participantNameClasses = cx({

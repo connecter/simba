@@ -25,14 +25,14 @@ $primary-button-bg: #3bafda;
 }
 
 @mixin button-icon-background($icon) {
-  background-image: url("../images/Icon/#{$icon}.svg");
+  background-image: url("../images/icons/#{$icon}.svg");
 
   &:hover, &:focus {
-    background-image: url("../images/Icon/#{$icon}_hover.svg");
+    background-image: url("../images/icons/#{$icon}_hover.svg");
   }
 
   &:active {
-    background-image: url("../images/Icon/#{$icon}_active.svg");
+    background-image: url("../images/icons/#{$icon}_active.svg");
   }
 }
 

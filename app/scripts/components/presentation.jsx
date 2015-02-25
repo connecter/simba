@@ -8,20 +8,16 @@ var Presentation = React.createClass({
     this.setup();
   },
 
-  componentDidUpdate: function(prevProps) {
-    if(this.props.largeVideo !== prevProps.largeVideo) {
-      this.setup();
-    }
+  componentDidUpdate:  function(prevProps) {
+    this.setup();
+  },
+
+  shouldComponentUpdate: function (nextProps, nextState) {
+    return this.props.largeVideo !== nextProps.largeVideo || this.props.isScreen !== nextProps.isScreen || this.props.largeVideo.videoType !== nextProps.largeVideo.videoType
   },
 
   componentWillUnmount: function() {
     this.cleanUp();
-  },
-
-  componentWillUpdate: function(prevProps) {
-    if(this.props.largeVideo !== prevProps.largeVideo) {
-      this.setup();
-    }
   },
 
   setup: function () {
@@ -70,12 +66,6 @@ var Presentation = React.createClass({
   },
 
   getDesktopVideoSize: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-    if (!videoWidth)
-      videoWidth = currentVideoWidth;
-    
-    if (!videoHeight)
-      videoHeight = currentVideoHeight;
-
     var aspectRatio = videoWidth / videoHeight;
     var availableWidth = Math.max(videoWidth, videoSpaceWidth);
     var availableHeight = Math.max(videoHeight, videoSpaceHeight);
@@ -125,7 +115,7 @@ var Presentation = React.createClass({
 
   positionLarge: function (videoWidth, videoHeight) {
     var videoSpaceWidth = $(this.refs.videoSpace.getDOMNode()).width();
-    var isScreen = this.props.largeVideo.videoType === 'screen';
+    var isScreen = this.props.largeVideo.videoType === 'screen' || this.props.isScreen;
     var videoSpaceHeight = isScreen ? $(this.refs.videoSpace.getDOMNode()).outerHeight() : window.innerHeight;
     var videoSize = this[isScreen ? 'getDesktopVideoSize': 'getCameraVideoSize'](videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight);
     var largeVideoWidth = videoSize[0];
