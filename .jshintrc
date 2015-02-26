@@ -1,5 +1,6 @@
 {
   "browser": true,
+  "browserify": true,
   "esnext": true,
   "bitwise": true,
   "camelcase": true,
@@ -10,9 +11,17 @@
   "latedef": true,
   "newcap": true,
   "noarg": true,
-  "quotmark": "single",
+  "quotmark": false,
   "undef": true,
-  "unused": true,
+  "latedef": false,
+  "unused": false,
   "strict": true,
-  "jquery": true
+  "jquery": true,
+  "globals": {
+    "APP": true,
+    "Strophe": true,
+    "console": true,
+    "config": true,
+    "alert": true
+  }
 }

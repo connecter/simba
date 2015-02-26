@@ -12,6 +12,7 @@ var browserify   = require('browserify');
 var browserSync  = require('browser-sync');
 var watchify     = require('watchify');
 var reactify     = require('reactify');
+var hintify     = require('hintify');
 var bundleLogger = require('../util/bundleLogger');
 var gulp         = require('gulp');
 var handleErrors = require('../util/handleErrors');
@@ -33,7 +34,9 @@ var browserifyTask = function(callback, devMode) {
       bundleConfig = _.omit(bundleConfig, ['external', 'require'])
     }
 
-    var b = browserify(bundleConfig).transform(reactify);
+    var b = browserify(bundleConfig)
+                      .transform(reactify)
+                      .transform(hintify);
 
     var bundle = function() {
       // Log when bundling starts

@@ -1,0 +1,3 @@
+app/meet/**
+app/jitsiServerMeetConfig.js
+app/meetConfig.js
