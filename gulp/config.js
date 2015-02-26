@@ -40,7 +40,8 @@ module.exports = {
       entries: src + '/scripts/main.js',
       dest: dest + '/scripts',
       extensions: ['.jsx'],
-      outputName: 'main.js'
+      outputName: 'main.js',
+      standalone: 'APP'
     }]
   },
   build: {

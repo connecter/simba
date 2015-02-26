@@ -8,7 +8,7 @@ var Container = require('./components/container');
 
 window.config = require('../meetConfig');
 
-var APP = window.APP = {
+var APP = {
   init: function () {
     this.UI = require("./modules/UI");
     this.connectionquality = require("../meet/modules/connectionquality/connectionquality");
