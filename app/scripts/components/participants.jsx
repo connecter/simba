@@ -39,7 +39,7 @@ var Participants = React.createClass({
           isPinned={that.props.isParticipantPinned(participant.jid)} 
           pinParticipant={that.props.pinParticipant} 
         />
-      )
+      );
     });
     return participants;
   },

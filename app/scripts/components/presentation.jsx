@@ -13,7 +13,7 @@ var Presentation = React.createClass({
   },
 
   shouldComponentUpdate: function (nextProps, nextState) {
-    return this.props.largeVideo !== nextProps.largeVideo || this.props.isScreen !== nextProps.isScreen || this.props.largeVideo.videoType !== nextProps.largeVideo.videoType
+    return this.props.largeVideo !== nextProps.largeVideo || this.props.isScreen !== nextProps.isScreen || this.props.largeVideo.videoType !== nextProps.largeVideo.videoType;
   },
 
   componentWillUnmount: function() {
@@ -42,7 +42,7 @@ var Presentation = React.createClass({
     this.resizeHandler = function() {
       clearTimeout(this.resizeTimer);
       this.resizeTimer = setTimeout(that.invokePositionLarge, 1000);
-    }
+    };
     
     $(window).on('resize', this.resizeHandler);
   },
@@ -87,8 +87,9 @@ var Presentation = React.createClass({
     var isFullScreen = document.fullScreen ||
       document.mozFullScreen ||
       document.webkitIsFullScreen;
-    if (isFullScreen)
+    if (isFullScreen) {
       videoSpaceHeight = window.innerHeight-100;
+    }
 
     var horizontalIndent = (videoSpaceWidth - videoWidth) / 2;
     var verticalIndent = (videoSpaceHeight - videoHeight) / 2;
@@ -124,7 +125,7 @@ var Presentation = React.createClass({
     var horizontalIndent = videoPosition[0];
     var verticalIndent = videoPosition[1];
 
-    this.positionVideo($(this.refs.largeVideo.getDOMNode()), largeVideoWidth, largeVideoHeight, horizontalIndent, verticalIndent)
+    this.positionVideo($(this.refs.largeVideo.getDOMNode()), largeVideoWidth, largeVideoHeight, horizontalIndent, verticalIndent);
   },
 
   render: function() {

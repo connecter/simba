@@ -1,8 +1,6 @@
 'use strict';
 
-var $ = require('jquery');
-
-window.$ = window.jquery = $;
+window.$ = window.jquery = require('jquery');
 
 var Container = require('./components/container');
 
@@ -26,7 +24,6 @@ var APP = {
     APP.UI.start();
   }
 };
-
 
 $(document).ready(function() {
   APP.init();

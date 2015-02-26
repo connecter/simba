@@ -6,7 +6,7 @@ var Screenshare = require('./screenshare');
 
 var Footer = React.createClass({
   getInitialState: function() {
-    return {isToolbarExpanded: false, isScreenshareOpen: false}
+    return {isToolbarExpanded: false, isScreenshareOpen: false};
   },
 
   toggleToolbar: function() {

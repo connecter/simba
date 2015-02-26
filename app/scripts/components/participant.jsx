@@ -3,7 +3,7 @@
 var React = require('react/addons');
 
 var Video = require("./video.jsx"),
-    Audio = require("./audio.jsx"),
+    AudioComponent = require("./audio.jsx"),
     AudioLevel = require("./audioLevel.jsx");
 
 var Participant = React.createClass({
@@ -21,19 +21,19 @@ var Participant = React.createClass({
 
   renderVideo: function() {
     if(this.props.participant.video && !this.props.participant.isScreen) {
-      return <Video stream={this.props.participant.video} shouldFlipVideo={this.props.local && !this.props.participant.isScreen} />
+      return <Video stream={this.props.participant.video} shouldFlipVideo={this.props.local && !this.props.participant.isScreen} />;
     }
   },
 
   renderAudio: function() {
     if(this.props.participant.audio) {
-      return <Audio stream={this.props.participant.audio} muteAudio={this.props.local}/>;
+      return <AudioComponent stream={this.props.participant.audio} muteAudio={this.props.local}/>;
     }
   },
 
   renderAudioLevel: function() {
     if(this.props.participant.audioLevel) {
-      return <AudioLevel audioLevel={this.props.participant.audioLevel} />
+      return <AudioLevel audioLevel={this.props.participant.audioLevel} />;
     }
   },
 

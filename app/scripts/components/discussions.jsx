@@ -6,26 +6,26 @@ var React = require('react'),
 
 var Discussions = React.createClass({
   getInitialState: function() {
-    return {collapsed: true, current_opened: null};
+    return {collapsed: true, currentOpened: null};
   },
 
   closeToggle: function() {
-    this.setState({collapsed: true, current_opened: null});
+    this.setState({collapsed: true, currentOpened: null});
   },
 
   openChat: function() {
-    this.setState({collapsed: false, current_opened: "chat"});
+    this.setState({collapsed: false, currentOpened: "chat"});
   },
 
   openNotes: function() {
-    this.setState({collapsed: false, current_opened: "notes"});
+    this.setState({collapsed: false, currentOpened: "notes"});
   },
 
   renderTool: function() {
-    if(this.state.current_opened === "chat") {
-      return <Chat />
-    } else if (this.state.current_opened === "notes") {
-      return <Notes />
+    if(this.state.currentOpened === "chat") {
+      return <Chat />;
+    } else if (this.state.currentOpened === "notes") {
+      return <Notes />;
     }
   },
 
@@ -37,11 +37,11 @@ var Discussions = React.createClass({
         }),
 
         chatButtonClasses = cx({
-          'is-toggled': this.state.current_opened === "chat"
+          'is-toggled': this.state.currentOpened === "chat"
         }),
 
         notesButtonClasses = cx({
-          'is-toggled': this.state.current_opened === "notes"
+          'is-toggled': this.state.currentOpened === "notes"
         });
 
     return (

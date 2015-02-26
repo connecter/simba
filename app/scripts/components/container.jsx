@@ -7,7 +7,7 @@ var Header = require('./header'),
     Footer = require('./footer'),
     Participants = require('./participants'),
     Discussions = require('./discussions'),
-    Presentation = require('./presentation')
+    Presentation = require('./presentation');
 
 var Container = React.createClass({
   getInitialState: function() {
@@ -34,7 +34,7 @@ var Container = React.createClass({
 
       newLocal.audio = null;
       that.setState({local: newLocal});
-    }
+    };
   },
 
   changeLocalVideo: function(stream) {
@@ -55,12 +55,12 @@ var Container = React.createClass({
   
   changeLargeVideoTo: function(participant, returnNewState) {
     if(!participant.videoMute) {
-      var newState = {}
+      var newState = {};
       newState.largeVideo = {
         userJid: participant.jid,
         stream: participant.video,
         isScreen: participant.isScreen
-      }
+      };
 
       if(returnNewState) {
         return newState.largeVideo;
@@ -71,7 +71,7 @@ var Container = React.createClass({
   },
 
   setLocalName: function(nickname) {
-    var newLocal = this.state.local
+    var newLocal = this.state.local;
         
     newLocal.displayName = nickname;
     this.setState({local: newLocal});
@@ -139,9 +139,9 @@ var Container = React.createClass({
                 findVideoType();
               }
             }, 0);
-          }
+          };
 
-      participant[participantId] = this.state.participants[participantId] || {}
+      participant[participantId] = this.state.participants[participantId] || {};
       
       if(stream.type==="Video") {
         participant[participantId].video = stream;        
@@ -156,7 +156,7 @@ var Container = React.createClass({
         findVideoType();
       } 
 
-      if(stream.type=="Audio") {
+      if(stream.type==="Audio") {
         participant[participantId].audio = stream;
         this.setState({participants: _.assign(that.state.participants, participant)});
       }
@@ -218,7 +218,7 @@ var Container = React.createClass({
   },
 
   addParticipant: function(jid, id, displayName) {
-    var newParticipant = {}
+    var newParticipant = {};
     
     newParticipant['participant_' + Strophe.getResourceFromJid(jid)] = {
       jid: jid,
@@ -237,7 +237,7 @@ var Container = React.createClass({
       var participant = {};
 
       participant[participantId] = this.state.participants[participantId] || {};
-      participant[participantId]['displayName'] = newName;
+      participant[participantId].displayName = newName;
 
       this.setState({participants: _.assign(this.state.participants, participant)});
     }
@@ -325,7 +325,7 @@ var Container = React.createClass({
               isParticipantActive={this.isParticipantActive}
               isParticipantPinned={this.isParticipantPinned}
               pinParticipant={this.pinParticipant}
-            ></Participants>)
+            ></Participants>);
   },
 
   render: function() {

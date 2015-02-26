@@ -1,8 +1,7 @@
 "use strict";
 
 var React = require('react');
-
-var Audio = React.createClass({
+var AudioComponent = React.createClass({
   propTypes: {
     muteAudio: React.PropTypes.bool
   },
@@ -22,7 +21,7 @@ var Audio = React.createClass({
     APP.RTC.attachMediaStream($(audioNode), this.props.stream.getOriginalStream());
     if (this.props.muteAudio) {
       audioNode.volume = 0;
-    };
+    }
   },
 
   render: function() {
@@ -33,4 +32,4 @@ var Audio = React.createClass({
 
 });
 
-module.exports = Audio;
+module.exports = AudioComponent;
