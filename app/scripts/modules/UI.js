@@ -1,3 +1,5 @@
+"use strict";
+
 var UI = {};
 var EventEmitter = require("events");
 var React = require("react");
@@ -122,11 +124,11 @@ UI.start = function() {
 
 UI.addListener = function (type, listener) {
   eventEmitter.on(type, listener);
-}
+};
 
 UI.getLargeVideoState = function() {
   return View.getLargeVideoState();
-}
+};
 
 UI.disableConnect = function () {
   return; 
@@ -138,8 +140,10 @@ UI.checkForNicknameAndJoin = function () {
 };
 
 UI.generateRoomName = function() {
-  if(roomName)
+  if(roomName) {
     return roomName;
+  }
+
   var roomnode = null;
   var path = window.location.pathname;
 
