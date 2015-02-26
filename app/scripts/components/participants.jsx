@@ -4,7 +4,7 @@ var React = require('react/addons'),
     _ = require('lodash');
 
 var Invite = require("./invite"),
-    Participant = require("./Participant");
+    Participant = require("./participant");
 
 var Participants = React.createClass({
   propTypes: {
