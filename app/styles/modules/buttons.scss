@@ -45,7 +45,7 @@ $primary-button-bg: #3bafda;
 @each $button in $buttons-with-toggled-state-list {
   .btn-#{$button} {
     &.is-toggled {
-      background-image: url("../images/Icon/#{$button}_toggled.svg");
+      background-image: url("../images/icons/#{$button}_toggled.svg");
     }
   }
 }
@@ -53,7 +53,7 @@ $primary-button-bg: #3bafda;
 @each $button in $buttons-with-disabled-state-list {
   .btn-#{$button} {
     &.disabled, &:disabled {
-      background-image: url("../images/Icon/#{$button}_disabled.svg");
+      background-image: url("../images/icons/#{$button}_disabled.svg");
     }
   }
 }
