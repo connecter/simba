@@ -19,6 +19,15 @@ var Footer = React.createClass({
         'is-expanded': this.state.isToolbarExpanded,
       }),
 
+      pointerButtonClasses = cx({
+        'is-toggled': this.props.collaborationToolsToggles.pointer
+      }),
+
+      pointerButtonText = cx({
+        "Show my cursor to participants": !this.props.collaborationToolsToggles.pointer,
+        "Stop showing my cursor to participants": this.props.collaborationToolsToggles.pointer
+      }),
+
       toggleButtonClasses = cx({
         'btn-arrow-small-right': !this.state.isToolbarExpanded,
         'btn-arrow-small-left': this.state.isToolbarExpanded
@@ -34,30 +43,30 @@ var Footer = React.createClass({
       }),
 
       videoButtonClasses = cx({
-        'is-toggled': this.props.callControlToggleStates.videoMute
+        'is-toggled': this.props.callControlToggles.videoMute
       }),
 
       videoButtonText = cx({
-        'Turn video off': !this.props.callControlToggleStates.videoMute,
-        'Turn video on': this.props.callControlToggleStates.videoMute
+        'Turn video off': !this.props.callControlToggles.videoMute,
+        'Turn video on': this.props.callControlToggles.videoMute
       }),
 
       audioButtonClasses = cx({
-        'is-toggled': this.props.callControlToggleStates.micMute
+        'is-toggled': this.props.callControlToggles.micMute
       }),
 
       audioButtonText = cx({
-        'Turn mic off': !this.props.callControlToggleStates.micMute,
-        'Turn mic on': this.props.callControlToggleStates.micMute
+        'Turn mic off': !this.props.callControlToggles.micMute,
+        'Turn mic on': this.props.callControlToggles.micMute
       }),
 
       screenshareButtonClasses = cx({
-        'is-toggled': this.props.callControlToggleStates.screenStream
+        'is-toggled': this.props.callControlToggles.screenStream
       }),
 
       screenshareText = cx({
-        'Share screen': !this.props.callControlToggleStates.screenStream,
-        'Turn screen sharing off': this.props.callControlToggleStates.screenStream
+        'Share screen': !this.props.callControlToggles.screenStream,
+        'Turn screen sharing off': this.props.callControlToggles.screenStream
       });
 
     return (
@@ -66,7 +75,7 @@ var Footer = React.createClass({
           <ul className={"toolbar btn-group pull-left " + toolbarClasses}>
             <li><button className={"btn-icon btn-screenshare " + screenshareButtonClasses} onClick={this.props.execCommand("toggleScreenshare")} title={screenshareText}><span className="sr-only">{screenshareText}</span></button></li>
             <li><div className="vertical-seperator"></div></li>
-            <li><button className="btn-icon btn-cursor" title="Show my cursor to participants"><span className="sr-only">Show my cursor to participants</span></button></li>
+            <li><button className={"btn-icon btn-cursor " + pointerButtonClasses} title={pointerButtonText} onClick={this.props.execCommand("togglePointer")}><span className="sr-only">Show my cursor to participants</span></button></li>
             <li><button className="btn-icon btn-pen" title="Draw on screen"><span className="sr-only">Draw on screen</span></button></li>
             <li><button className="btn-icon btn-text" title="Write on screen"><span className="sr-only">Write on screen</span></button></li>
             <li><button className="btn-icon btn-undo" title="Undo"><span className="sr-only">Undo</span></button></li>

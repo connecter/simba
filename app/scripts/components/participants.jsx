@@ -27,21 +27,17 @@ var Participants = React.createClass({
   },
 
   renderParticipants: function() {
-    var participants = [];
     var that = this;
 
-    _.forEach(this.props.participants, function(participant, key) {
-      participants.push(
-        <Participant
-          participant={participant}
-          key={key}
-          isActive={that.props.isParticipantActive(participant.jid)}
-          isPinned={that.props.isParticipantPinned(participant.jid)} 
-          pinParticipant={that.props.pinParticipant} 
-        />
-      );
+    return _.map(this.props.participants, function(participant, key) {
+      return <Participant
+        participant={participant}
+        key={key}
+        isActive={that.props.isParticipantActive(participant.jid)}
+        isPinned={that.props.isParticipantPinned(participant.jid)} 
+        pinParticipant={that.props.pinParticipant} 
+      />;
     });
-    return participants;
   },
 
   render: function() {

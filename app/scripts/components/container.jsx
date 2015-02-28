@@ -18,8 +18,17 @@ var Container = React.createClass({
         userJid: null
       },
       local: {jid:'local'},
-      callControlToggleStates: {}
+      callControlToggles: {},
+      collaborationToolsToggles: {}
     };
+  },
+
+  sendCommand: function(command) {
+    APP.xmpp.sendChatMessage(JSON.stringify(command));
+  },
+
+  processCommand: function(command) {
+    this.refs.presentation.processCommand.apply(this.refs.presentation, command);
   },
 
   changeLocalAudio: function(stream) {
@@ -43,7 +52,7 @@ var Container = React.createClass({
 
     newState.local.video = stream;
     newState.local.isScreen = APP.desktopsharing.isUsingScreenStream();
-    this.setState({callControlToggleStates: _.assign(this.state.callControlToggleStates,
+    this.setState({callControlToggles: _.assign(this.state.callControlToggles,
         {screenStream: newState.local.isScreen})});
 
     if(this.state.largeVideo.userJid===null || this.state.largeVideo.userJid==='local') {
@@ -80,21 +89,21 @@ var Container = React.createClass({
   toggleVideo: function() {
     var that = this;
 
-    APP.xmpp.setVideoMute(!this.state.callControlToggleStates.videoMute, function() {
+    APP.xmpp.setVideoMute(!this.state.callControlToggles.videoMute, function() {
       var newLocal = that.state.local;
     
-      newLocal.videoMute = !that.state.callControlToggleStates.videoMute;
-      that.setState({callControlToggleStates: _.assign(that.state.callControlToggleStates,
-        {videoMute: !that.state.callControlToggleStates.videoMute}), local:newLocal});
+      newLocal.videoMute = !that.state.callControlToggles.videoMute;
+      that.setState({callControlToggles: _.assign(that.state.callControlToggles,
+        {videoMute: !that.state.callControlToggles.videoMute}), local:newLocal});
     });
   },
 
   toggleAudio: function() {
     var that = this;
 
-    APP.xmpp.setAudioMute(!this.state.callControlToggleStates.micMute, function() {
-      that.setState({callControlToggleStates: _.assign(that.state.callControlToggleStates,
-        {micMute: !that.state.callControlToggleStates.micMute})});
+    APP.xmpp.setAudioMute(!this.state.callControlToggles.micMute, function() {
+      that.setState({callControlToggles: _.assign(that.state.callControlToggles,
+        {micMute: !that.state.callControlToggles.micMute})});
     });
   },
 
@@ -109,6 +118,11 @@ var Container = React.createClass({
       "You hung up the call. Refresh the browser to join again"
     );
   },
+
+  togglePointer: function() {
+    this.setState({callControlToggles: _.assign(this.state.collaborationToolsToggles,
+        {pointer: !this.state.collaborationToolsToggles.pointer})});
+    },
 
   execCommand: function(command) {
     var that = this;
@@ -252,7 +266,7 @@ var Container = React.createClass({
     if (jid === APP.xmpp.myJid() || jid === 'local') {
       var newLocal = this.state.local;
 
-      if(this.state.callControlToggleStates.micMute) {
+      if(this.state.callControlToggles.micMute) {
         newLocal.audioLevel = 0;
       } else {
         newLocal.audioLevel = audioLevel;
@@ -313,7 +327,12 @@ var Container = React.createClass({
   renderPresentation: function() {
     if(this.state.largeVideo.stream) {
       return (
-        <Presentation largeVideo={this.state.largeVideo.stream} isScreen={this.state.largeVideo.isScreen} shouldFlipVideo={this.shouldFlipVideo()}></Presentation>
+        <Presentation ref="presentation" 
+                      largeVideo={this.state.largeVideo.stream}
+                      isScreen={this.state.largeVideo.isScreen}
+                      shouldFlipVideo={this.shouldFlipVideo()}
+                      collaborationToolsToggles={this.state.collaborationToolsToggles}
+                      sendCommand={this.sendCommand} />
       );
     }
   },
@@ -335,7 +354,7 @@ var Container = React.createClass({
         {this.renderPresentation()}
         {this.renderParticipants()}
         <Discussions></Discussions>
-        <Footer execCommand={this.execCommand} callControlToggleStates={this.state.callControlToggleStates}></Footer>
+        <Footer execCommand={this.execCommand} callControlToggles={this.state.callControlToggles} collaborationToolsToggles={this.state.collaborationToolsToggles}></Footer>
       </div>
     );
   }

@@ -1,145 +1,64 @@
 "use strict";
 
-var React = require('react/addons');
+var React = require('react/addons'),
+    LargeVideo = require('./largeVideo'),
+    Whiteboard = require('./whiteboard');
 
 var Presentation = React.createClass({
-
-  componentDidMount: function() {
-    this.setup();
+  propTypes: {
+    largeVideo: React.PropTypes.object.isRequired,
+    isScreen: React.PropTypes.bool.isRequired,
+    sendCommand: React.PropTypes.func.isRequired,
+    collaborationToolsToggles: React.PropTypes.object.isRequired,
+    shouldFlipVideo: React.PropTypes.bool
   },
 
-  componentDidUpdate:  function(prevProps) {
-    this.setup();
+  getInitialState: function () {
+      return {
+        dimensions: {
+          width: 'auto',
+          height: 'auto'
+        }
+      };
   },
 
-  shouldComponentUpdate: function (nextProps, nextState) {
-    return this.props.largeVideo !== nextProps.largeVideo || this.props.isScreen !== nextProps.isScreen || this.props.largeVideo.videoType !== nextProps.largeVideo.videoType;
+  getPresentationSpaceDOMNode: function() {
+    return this.refs.presentationSpace.getDOMNode();
   },
 
-  componentWillUnmount: function() {
-    this.cleanUp();
+  setDimensions: function(dimensions) {
+    this.setState({dimensions: dimensions});
   },
 
-  setup: function () {
-    var videoNode = this.refs.largeVideo.getDOMNode();
-    APP.RTC.attachMediaStream($(videoNode), this.props.largeVideo.getOriginalStream());
-    $(videoNode).on('loadedmetadata', this.invokePositionLarge);
-  },
-  
-  cleanUp: function () {
-    var videoNode = this.refs.largeVideo.getDOMNode();    
-    $(videoNode).off('loadedmetadata', this.invokePositionLarge);
-    $(videoNode).off('resize', this.resizeHandler);
-    clearTimeout(this.resizeTimer);
-  },
-
-  invokePositionLarge: function() {
-    var videoNode = this.refs.largeVideo.getDOMNode(),
-        that = this;
-    
-    this.positionLarge(videoNode.videoWidth, videoNode.videoHeight);
-    
-    this.resizeHandler = function() {
-      clearTimeout(this.resizeTimer);
-      this.resizeTimer = setTimeout(that.invokePositionLarge, 1000);
-    };
-    
-    $(window).on('resize', this.resizeHandler);
-  },
-
-  getCameraVideoSize: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-    var aspectRatio = videoWidth / videoHeight;
-    var availableWidth = Math.max(videoWidth, videoSpaceWidth);
-    var availableHeight = Math.max(videoHeight, videoSpaceHeight);
-
-    if (availableWidth / aspectRatio < videoSpaceHeight) {
-      availableHeight = videoSpaceHeight;
-      availableWidth = availableHeight * aspectRatio;
+  processCommand: function() {
+    if(this.refs[arguments[0]]) {
+      this.refs[arguments[0]]
+          .processCommand
+          .apply(this.refs[arguments[0]], Array.prototype.slice.call(arguments,1));
     }
-
-    if (availableHeight * aspectRatio < videoSpaceWidth) {
-      availableWidth = videoSpaceWidth;
-      availableHeight = availableWidth / aspectRatio;
-    }
-
-    return [availableWidth, availableHeight];
   },
 
-  getDesktopVideoSize: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-    var aspectRatio = videoWidth / videoHeight;
-    var availableWidth = Math.max(videoWidth, videoSpaceWidth);
-    var availableHeight = Math.max(videoHeight, videoSpaceHeight);
-
-    if (availableWidth / aspectRatio >= videoSpaceHeight) {
-      availableHeight = videoSpaceHeight;
-      availableWidth = availableHeight * aspectRatio;
-    }
-
-    if (availableHeight * aspectRatio >= videoSpaceWidth) {
-      availableWidth = videoSpaceWidth;
-      availableHeight = availableWidth / aspectRatio;
-    }
-
-    return [availableWidth, availableHeight];
-  },
-
-  getCameraVideoPosition: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-    var isFullScreen = document.fullScreen ||
-      document.mozFullScreen ||
-      document.webkitIsFullScreen;
-    if (isFullScreen) {
-      videoSpaceHeight = window.innerHeight-100;
-    }
-
-    var horizontalIndent = (videoSpaceWidth - videoWidth) / 2;
-    var verticalIndent = (videoSpaceHeight - videoHeight) / 2;
-
-    return [horizontalIndent, verticalIndent];
-  },
-
-  getDesktopVideoPosition: function(videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight) {
-    var horizontalIndent = (videoSpaceWidth - videoWidth) / 2;
-    var verticalIndent = 0;
-    return [horizontalIndent, verticalIndent];
-  },
-
-  positionVideo: function(video, width, height, horizontalIndent, verticalIndent) {  
-    video.width(width);
-    video.height(height);
-    video.css({  top: verticalIndent + 'px',
-      bottom: verticalIndent + 'px',
-      left: horizontalIndent + 'px',
-      right: horizontalIndent + 'px',
-      position: "absolute"
-    });
-  },
-
-  positionLarge: function (videoWidth, videoHeight) {
-    var videoSpaceWidth = $(this.refs.videoSpace.getDOMNode()).width();
-    var isScreen = this.props.largeVideo.videoType === 'screen' || this.props.isScreen;
-    var videoSpaceHeight = isScreen ? $(this.refs.videoSpace.getDOMNode()).outerHeight() : window.innerHeight;
-    var videoSize = this[isScreen ? 'getDesktopVideoSize': 'getCameraVideoSize'](videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight);
-    var largeVideoWidth = videoSize[0];
-    var largeVideoHeight = videoSize[1];
-    var videoPosition = this[isScreen ? 'getDesktopVideoPosition': 'getCameraVideoPosition'](largeVideoWidth, largeVideoHeight, videoSpaceWidth, videoSpaceHeight);
-    var horizontalIndent = videoPosition[0];
-    var verticalIndent = videoPosition[1];
-
-    this.positionVideo($(this.refs.largeVideo.getDOMNode()), largeVideoWidth, largeVideoHeight, horizontalIndent, verticalIndent);
+  renderWhiteboard: function() {
+    return <Whiteboard
+              id={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
+              ref={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
+              dimensions={this.state.dimensions} 
+              collaborationToolsToggles={this.props.collaborationToolsToggles} 
+              sendCommand={this.props.sendCommand} />;
   },
 
   render: function() {
-     var cx = React.addons.classSet;
-     var videoClasses = cx({
-      'flip-x': this.props.shouldFlipVideo 
-    });
     return (
-      <section className="presentation row" ref="videoSpace">
-        <video ref="largeVideo" autoPlay="true" className={videoClasses}></video>
+      <section className="presentation row" ref="presentationSpace">
+        {this.renderWhiteboard()}
+        <LargeVideo largeVideo={this.props.largeVideo}
+                    isScreen={this.props.isScreen}
+                    getPresentationSpaceDOMNode={this.getPresentationSpaceDOMNode}
+                    setDimensions={this.setDimensions}
+                    shouldFlipVideo={this.props.shouldFlipVideo} />
       </section>
     );
   }
-
 });
 
 module.exports = Presentation;

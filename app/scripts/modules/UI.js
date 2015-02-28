@@ -36,6 +36,8 @@ function registerListeners() {
 
   APP.xmpp.addListener(XMPPEvents.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
 
+  APP.xmpp.addListener(XMPPEvents.MESSAGE_RECEIVED, processCommandReceivedThroughChat);
+
   APP.RTC.addListener(RTCEvents.LASTN_CHANGED, function (lastNEndpoints, endpointsEnteringLastN, stream) {
     console.log("LASTN_CHANGED");
     console.log(arguments);
@@ -113,6 +115,10 @@ function onDisplayNameChanged(jid, displayName) {
 
 function audioLevelHandler(jid, audioLevel) {
   View.updateAudioLevel(jid, audioLevel);
+}
+
+function processCommandReceivedThroughChat(from, display, command) {
+  View.processCommand(JSON.parse(command));
 }
 
 UI.start = function() {
