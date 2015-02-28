@@ -15,6 +15,7 @@
   "undef": true,
   "latedef": false,
   "unused": false,
+  "debug": true,
   "strict": true,
   "jquery": true,
   "globals": {
