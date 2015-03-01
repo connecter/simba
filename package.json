@@ -3,6 +3,13 @@
   "engines": {
     "node": ">=0.10.0"
   },
+
+  "browser" : {
+    "canvas" : false,
+    "jsdom":   false,
+    "xmldom":  false
+  },
+
   "devDependencies": {
     "apache-server-configs": "^2.7.1",
     "browser-sync": "^2.2.0",

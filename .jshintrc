@@ -23,6 +23,7 @@
     "Strophe": true,
     "console": true,
     "config": true,
-    "alert": true
+    "alert": true,
+    "fabric": true
   }
 }

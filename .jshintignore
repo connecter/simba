@@ -1,3 +1,4 @@
 app/meet/**
 app/jitsiServerMeetConfig.js
 app/meetConfig.js
+app/scripts/vendor/**
