@@ -11,7 +11,7 @@ var whiteboard = React.createClass({
     id: React.PropTypes.string.isRequired,
     dimensions: React.PropTypes.object.isRequired,
     sendCommand: React.PropTypes.func.isRequired,
-    collaborationToolsToggles: React.PropTypes.object.isRequired,
+    collaborationToolsToggle: React.PropTypes.string.isRequired,
     participants: React.PropTypes.object.isRequired
   },
 
@@ -57,7 +57,7 @@ var whiteboard = React.createClass({
     var x = e.pageX;
     var y = e.pageY;
 
-    if(this.props.collaborationToolsToggles.pointer) {
+    if(this.props.collaborationToolsToggle === 'pointer') {
       var that = this;
       
       this.setState({localPointer: {
@@ -83,7 +83,7 @@ var whiteboard = React.createClass({
   handleMouseLeave: function() {
     clearTimeout(this.pointerTransmitionTimer);
 
-    if(this.props.collaborationToolsToggles.pointer) {
+    if(this.props.collaborationToolsToggle === 'pointer') {
       this.setState({localPointer: null});
       this.props.sendCommand([
         this.props.id,  // whiteboard id
@@ -94,7 +94,7 @@ var whiteboard = React.createClass({
   },
 
   renderLocalMousePointer: function() {
-    if(this.state.localPointer && this.props.collaborationToolsToggles.pointer) {
+    if(this.state.localPointer && this.props.collaborationToolsToggle === 'pointer') {
       return <MousePointer participant={this.state.localPointer} local={true} />;
     }
   },
@@ -106,9 +106,11 @@ var whiteboard = React.createClass({
   },
 
   render: function() {
+    var whiteboardClass = this.props.collaborationToolsToggle;
+
     return (
       <div className="whiteboard-wrap" style={this.props.dimensions}>
-        <div className="whiteboard">
+        <div className={"whiteboard " + whiteboardClass}>
           {this.renderLocalMousePointer()}
           {this.renderParticipantsMousePointers()}
           <canvas ref="canvas"

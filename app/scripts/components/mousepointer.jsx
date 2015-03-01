@@ -15,9 +15,9 @@ var MousePointer = React.createClass({
     };
 
     var cx = React.addons.classSet,
-    pointerClasses = cx({
-      'no-bg': this.props.local
-    });
+        pointerClasses = cx({
+          'no-bg': this.props.local
+        });
 
     return (
       <div className={"pointer " + pointerClasses} style={pointerStyle} >

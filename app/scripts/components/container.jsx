@@ -19,7 +19,7 @@ var Container = React.createClass({
       },
       local: {jid:'local'},
       callControlToggles: {},
-      collaborationToolsToggles: {}
+      collaborationToolsToggle: ''
     };
   },
 
@@ -120,9 +120,16 @@ var Container = React.createClass({
   },
 
   togglePointer: function() {
-    this.setState({callControlToggles: _.assign(this.state.collaborationToolsToggles,
-        {pointer: !this.state.collaborationToolsToggles.pointer})});
-    },
+    this.setState({collaborationToolsToggle: this.state.collaborationToolsToggle === 'pointer' ? '' : 'pointer'});
+  },  
+
+  togglePen: function() {
+    this.setState({collaborationToolsToggle: this.state.collaborationToolsToggle === 'pen' ? '' : 'pen'});
+  },  
+
+  toggleText: function() {
+    this.setState({collaborationToolsToggle: this.state.collaborationToolsToggle === 'text' ? '' : 'text'});
+  },
 
   execCommand: function(command) {
     var that = this;
@@ -331,7 +338,7 @@ var Container = React.createClass({
                       largeVideo={this.state.largeVideo.stream}
                       isScreen={this.state.largeVideo.isScreen}
                       shouldFlipVideo={this.shouldFlipVideo()}
-                      collaborationToolsToggles={this.state.collaborationToolsToggles}
+                      collaborationToolsToggle={this.state.collaborationToolsToggle}
                       sendCommand={this.sendCommand} participants={this.state.participants} />
       );
     }
@@ -354,7 +361,7 @@ var Container = React.createClass({
         {this.renderPresentation()}
         {this.renderParticipants()}
         <Discussions></Discussions>
-        <Footer execCommand={this.execCommand} callControlToggles={this.state.callControlToggles} collaborationToolsToggles={this.state.collaborationToolsToggles}></Footer>
+        <Footer execCommand={this.execCommand} callControlToggles={this.state.callControlToggles} collaborationToolsToggle={this.state.collaborationToolsToggle}></Footer>
       </div>
     );
   }

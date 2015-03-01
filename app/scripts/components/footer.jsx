@@ -5,6 +5,11 @@ var React = require('react/addons');
 var Screenshare = require('./screenshare');
 
 var Footer = React.createClass({
+  propTypes: {
+    execCommand: React.PropTypes.func.isRequired,
+    callControlToggles: React.PropTypes.object.isRequired, 
+    collaborationToolsToggle: React.PropTypes.string.isRequired
+  },
   getInitialState: function() {
     return {isToolbarExpanded: false, isScreenshareOpen: false};
   },
@@ -20,12 +25,30 @@ var Footer = React.createClass({
       }),
 
       pointerButtonClasses = cx({
-        'is-toggled': this.props.collaborationToolsToggles.pointer
+        'is-toggled': this.props.collaborationToolsToggle === 'pointer'
       }),
 
       pointerButtonText = cx({
-        "Show my cursor to participants": !this.props.collaborationToolsToggles.pointer,
-        "Stop showing my cursor to participants": this.props.collaborationToolsToggles.pointer
+        'Show my cursor to participants': this.props.collaborationToolsToggle !== 'pointer',
+        'Stop showing my cursor to participants': this.props.collaborationToolsToggle === 'pointer'
+      }),      
+
+      penButtonClasses = cx({
+        'is-toggled': this.props.collaborationToolsToggle === 'pen'
+      }),
+
+      penButtonText = cx({
+        'Draw on screen': this.props.collaborationToolsToggle !== 'pen',
+        'Stop drawing': this.props.collaborationToolsToggle === 'pen'
+      }),
+      
+      textButtonClasses = cx({
+        'is-toggled': this.props.collaborationToolsToggle === 'text'
+      }),
+
+      textButtonText = cx({
+        'Write on screen': this.props.collaborationToolsToggle !== 'text',
+        'Stop writing on screen': this.props.collaborationToolsToggle === 'text'
       }),
 
       toggleButtonClasses = cx({
@@ -75,9 +98,9 @@ var Footer = React.createClass({
           <ul className={"toolbar btn-group pull-left " + toolbarClasses}>
             <li><button className={"btn-icon btn-screenshare " + screenshareButtonClasses} onClick={this.props.execCommand("toggleScreenshare")} title={screenshareText}><span className="sr-only">{screenshareText}</span></button></li>
             <li><div className="vertical-seperator"></div></li>
-            <li><button className={"btn-icon btn-cursor " + pointerButtonClasses} title={pointerButtonText} onClick={this.props.execCommand("togglePointer")}><span className="sr-only">Show my cursor to participants</span></button></li>
-            <li><button className="btn-icon btn-pen" title="Draw on screen"><span className="sr-only">Draw on screen</span></button></li>
-            <li><button className="btn-icon btn-text" title="Write on screen"><span className="sr-only">Write on screen</span></button></li>
+            <li><button className={"btn-icon btn-cursor " + pointerButtonClasses} title={pointerButtonText} onClick={this.props.execCommand("togglePointer")}><span className="sr-only">{pointerButtonText}</span></button></li>
+            <li><button className={"btn-icon btn-pen " + penButtonClasses} title={penButtonText} onClick={this.props.execCommand("togglePen")}><span className="sr-only">{penButtonText}</span></button></li>
+            <li><button className={"btn-icon btn-text " + textButtonClasses} title={textButtonText} onClick={this.props.execCommand("toggleText")}><span className="sr-only">{textButtonText}</span></button></li>
             <li><button className="btn-icon btn-undo" title="Undo"><span className="sr-only">Undo</span></button></li>
             <li><button className="btn-icon btn-clear" title="Clear"><span className="sr-only">Clear</span></button></li>
             <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>

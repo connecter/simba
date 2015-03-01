@@ -9,7 +9,7 @@ var Presentation = React.createClass({
     largeVideo: React.PropTypes.object.isRequired,
     isScreen: React.PropTypes.bool.isRequired,
     sendCommand: React.PropTypes.func.isRequired,
-    collaborationToolsToggles: React.PropTypes.object.isRequired,
+    collaborationToolsToggle: React.PropTypes.string.isRequired,
     shouldFlipVideo: React.PropTypes.bool,
     participants: React.PropTypes.object.isRequired
   },
@@ -44,7 +44,7 @@ var Presentation = React.createClass({
               id={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
               ref={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
               dimensions={this.state.dimensions} 
-              collaborationToolsToggles={this.props.collaborationToolsToggles} 
+              collaborationToolsToggle={this.props.collaborationToolsToggle} 
               sendCommand={this.props.sendCommand} 
               participants={this.props.participants} />;
   },
