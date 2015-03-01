@@ -21,8 +21,27 @@
 
 .pointer {
   @extend .z-index-level_-1;
-  width: 30px;
-  height: 30px;
-  background-color: red;
   position: absolute;
+  height: 40px;
+  width: 40px;
+  background: url("../images/icons/cursor_toggled.svg") top left no-repeat;
+
+  &.no-bg {
+    background: none;
+
+    .name {
+      top: 35px;
+      left: 20px;  
+    }
+  }
+
+  .name {
+    position: relative;
+    top: 45px;
+    left: 20px;
+    color: #fff;
+    padding: 1px 3px;
+    background-color: #000;
+    font-size: 14px;
+  }
 }

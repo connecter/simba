@@ -332,7 +332,7 @@ var Container = React.createClass({
                       isScreen={this.state.largeVideo.isScreen}
                       shouldFlipVideo={this.shouldFlipVideo()}
                       collaborationToolsToggles={this.state.collaborationToolsToggles}
-                      sendCommand={this.sendCommand} />
+                      sendCommand={this.sendCommand} participants={this.state.participants} />
       );
     }
   },

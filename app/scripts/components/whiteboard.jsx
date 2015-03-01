@@ -11,7 +11,8 @@ var whiteboard = React.createClass({
     id: React.PropTypes.string.isRequired,
     dimensions: React.PropTypes.object.isRequired,
     sendCommand: React.PropTypes.func.isRequired,
-    collaborationToolsToggles: React.PropTypes.object.isRequired
+    collaborationToolsToggles: React.PropTypes.object.isRequired,
+    participants: React.PropTypes.object.isRequired
   },
 
   getInitialState: function () {
@@ -27,7 +28,8 @@ var whiteboard = React.createClass({
       newParticipant['participant_' + resourceJid] = {
         resourceJid: resourceJid,
         x: x * this.props.dimensions.width,
-        y: y * this.props.dimensions.height - 40
+        y: y * this.props.dimensions.height - 40,
+        displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone'
       };
       this.setState({pariticipantsWithPointers: _.assign(this.state.pariticipantsWithPointers, newParticipant)});
     }
@@ -51,18 +53,6 @@ var whiteboard = React.createClass({
     }
   },
 
-  renderParticipantsMousePointers: function() {
-    return _.map(this.state.pariticipantsWithPointers, function(participant, key) {
-      return <MousePointer ref={key} participant={participant}/>;
-    });
-  },
-
-  handleMouseEnter: function() {
-    if(this.props.collaborationToolsToggles.pointer) {
-      
-    }
-  },
-
   handleMouseMove: function(e) {
     var x = e.pageX;
     var y = e.pageY;
@@ -70,6 +60,12 @@ var whiteboard = React.createClass({
     if(this.props.collaborationToolsToggles.pointer) {
       var that = this;
       
+      this.setState({localPointer: {
+        x: x - this.props.dimensions.left,
+        y: y - this.props.dimensions.top - 40,
+        displayName: 'You'
+      }});
+
       clearTimeout(that.pointerTransmitionTimer);
 
       this.pointerTransmitionTimer = window.setTimeout(function(){
@@ -77,8 +73,8 @@ var whiteboard = React.createClass({
           that.props.id,  // whiteboard id
           'updatePointer', // command
           APP.xmpp.myResource(), // resourceJid
-          (x - that.props.dimensions.left)/that.props.dimensions.width, // x
-          (y - that.props.dimensions.top)/that.props.dimensions.height, // y
+          (x - that.props.dimensions.left) / that.props.dimensions.width, // x
+          (y - that.props.dimensions.top) / that.props.dimensions.height, // y
         ]);
       }, 20); 
     }
@@ -88,6 +84,7 @@ var whiteboard = React.createClass({
     clearTimeout(this.pointerTransmitionTimer);
 
     if(this.props.collaborationToolsToggles.pointer) {
+      this.setState({localPointer: null});
       this.props.sendCommand([
         this.props.id,  // whiteboard id
         'deletePointer', // command
@@ -96,10 +93,23 @@ var whiteboard = React.createClass({
     }
   },
 
+  renderLocalMousePointer: function() {
+    if(this.state.localPointer && this.props.collaborationToolsToggles.pointer) {
+      return <MousePointer participant={this.state.localPointer} local={true} />;
+    }
+  },
+
+  renderParticipantsMousePointers: function() {
+    return _.map(this.state.pariticipantsWithPointers, function(participant, key) {
+      return <MousePointer ref={key} participant={participant} />;
+    });
+  },
+
   render: function() {
     return (
       <div className="whiteboard-wrap" style={this.props.dimensions}>
         <div className="whiteboard">
+          {this.renderLocalMousePointer()}
           {this.renderParticipantsMousePointers()}
           <canvas ref="canvas"
                   onMouseEnter={this.handleMouseEnter} 
