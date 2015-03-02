@@ -1,7 +1,6 @@
 'use strict';
 
 window.$ = window.jquery = require('jquery');
-window.fabric = require('./vendor/fabric');
 
 var Container = require('./components/container');
 
