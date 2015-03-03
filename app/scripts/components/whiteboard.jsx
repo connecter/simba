@@ -92,6 +92,37 @@ var whiteboard = React.createClass({
       'participant_' + resourceJid)});
   },
 
+  getPathBoundingBox: function(points) {
+    var xBounds = [],
+        yBounds = [],
+        p1 = points[0],
+        p2 = points[1],
+        startPoint = p1;
+
+    for (var i = 1, len = points.length; i < len; i++) {
+      var midPoint = p1.midPointFrom(p2);
+      // with startPoint, p1 as control point, midpoint as end point
+      xBounds.push(startPoint.x);
+      xBounds.push(midPoint.x);
+      yBounds.push(startPoint.y);
+      yBounds.push(midPoint.y);
+
+      p1 = points[i];
+      p2 = points[i+1];
+      startPoint = midPoint;
+    }
+
+    xBounds.push(p1.x);
+    yBounds.push(p1.y);
+
+    return {
+      minx: _.min(xBounds),
+      miny: _.min(yBounds),
+      maxx: _.min(xBounds),
+      maxy: _.min(yBounds)
+    };
+  },
+
   convertPointsToSVGPath: function(points, minX, minY) {
     var path = [],
         p1 = new fabric.Point(points[0].x - minX, points[0].y - minY),
@@ -122,26 +153,15 @@ var whiteboard = React.createClass({
     return _.map(points, function(point) {
       return new fabric.Point(
         point.x * that.props.dimensions.width,
-        point.y * that.props.dimensions.height - 40);
+        point.y * that.props.dimensions.height);
       }
     );
-  },
-
-  scaleBoundingBox: function(boundingBox) {
-    var scaledboundingBox = {},
-        that = this;
-
-    _.forEach(boundingBox, function(val, key) {
-      scaledboundingBox[key] = key[3] === 'x' ? val * that.props.dimensions.width : val * that.props.dimensions.height - 40;
-    });
-    
-    return scaledboundingBox;
   },
 
   updatePath: function(resourceJid, path) {
     if(resourceJid !== APP.xmpp.myResource()) {
       var points = this.scalePathPointsToCurrent(path.points),
-          boundingBox = this.scaleBoundingBox(path.boundingBox),
+          boundingBox = this.getPathBoundingBox(points),
           originLeft = boundingBox.minx  + (boundingBox.maxx - boundingBox.minx) / 2,
           originTop = boundingBox.miny  + (boundingBox.maxy - boundingBox.miny) / 2;
 
@@ -153,9 +173,7 @@ var whiteboard = React.createClass({
 
       newPath.set({
         left: originLeft,
-        top: originTop,
-        originX: 'center',
-        originY: 'center'
+        top: originTop
       });
 
       this.canvas.renderAll();
@@ -173,8 +191,8 @@ var whiteboard = React.createClass({
 
     return _.map(points, function(point){
       return new fabric.Point(
-        (point.x - that.props.dimensions.left) / that.props.dimensions.width,
-        (point.y - that.props.dimensions.top) / that.props.dimensions.height);
+        (point.x) / that.props.dimensions.width,
+        (point.y) / that.props.dimensions.height);
       }
     );
   },
@@ -183,8 +201,7 @@ var whiteboard = React.createClass({
     var points = this.scalePathPointsToStandard(this.canvas.freeDrawingBrush._points);
 
     return {
-      points: points,
-      boundingBox: this.canvas.freeDrawingBrush.getPathBoundingBox(points)
+      points: points
     };
   },
 
