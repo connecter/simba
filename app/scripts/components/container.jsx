@@ -23,8 +23,8 @@ var Container = React.createClass({
     };
   },
 
-  sendCommand: function(command) {
-    APP.xmpp.sendChatMessage(JSON.stringify(command));
+  sendCommand: function() {
+    APP.xmpp.sendChatMessage(JSON.stringify(Array.prototype.slice.call(arguments)));
   },
 
   processCommand: function(command) {
@@ -317,7 +317,7 @@ var Container = React.createClass({
 
   isParticipantActive: function(jid) {
     if (jid === 'local') {
-      return this.state.localName && this.state.largeVideo.userJid === jid && _.keys(this.state.participants).length > 0;
+      return this.state.largeVideo.userJid === jid && _.keys(this.state.participants).length > 0;
     } else {
       return this.state.dominantSpeaker === 'participant_' + Strophe.getResourceFromJid(jid) || this.state.pinnedParticipant === jid;
     }

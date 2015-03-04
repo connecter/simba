@@ -1,7 +1,9 @@
 "use strict";
 
 var React = require('react/addons'),
-    LargeVideo = require('./largeVideo'),
+    _ = require('lodash');  
+
+var  LargeVideo = require('./largeVideo'),
     Whiteboard = require('./whiteboard');
 
 var Presentation = React.createClass({
@@ -15,12 +17,13 @@ var Presentation = React.createClass({
   },
 
   getInitialState: function () {
-      return {
-        dimensions: {
-          width: 'auto',
-          height: 'auto'
-        }
-      };
+    return {
+      dimensions: {
+        width: 'auto',
+        height: 'auto'
+      },
+      whiteboard: {}
+    };
   },
 
   getPresentationSpaceDOMNode: function() {
@@ -31,7 +34,23 @@ var Presentation = React.createClass({
     this.setState({dimensions: dimensions});
   },
 
+  interceptSendingCommands: function() {
+    return {
+      updatePath: this.interceptUpdatePath
+    };
+  },
+
+  interceptReceivingCommands: function() {
+    return {
+      updatePath: this.interceptUpdatePath
+    };
+  },
+
   processCommand: function() {
+    if(this.interceptReceivingCommands()[arguments[1]]) {
+       this.interceptReceivingCommands()[arguments[1]].apply(this, arguments);
+    }
+
     if(this.refs[arguments[0]]) {
       this.refs[arguments[0]]
           .processCommand
@@ -39,14 +58,35 @@ var Presentation = React.createClass({
     }
   },
 
+  sendCommand: function() {
+    if(this.interceptSendingCommands()[arguments[1]]) {
+     this.interceptSendingCommands()[arguments[1]].apply(this, arguments);
+    }
+    
+    this.props.sendCommand.apply(this, arguments);
+  },
+
+  interceptUpdatePath: function(whiteboardId, commandName, resourceJid, path) {
+    var newWhiteboardState = {};
+
+    newWhiteboardState[whiteboardId] = this.state.whiteboard[whiteboardId]  || {};
+    newWhiteboardState[whiteboardId][resourceJid] = newWhiteboardState[whiteboardId][resourceJid] || [];
+    newWhiteboardState[whiteboardId][resourceJid].push(path);
+    
+    this.setState({whiteboard: _.assign(this.state.whiteboard, newWhiteboardState)});
+  },
+
   renderWhiteboard: function() {
+    var whiteboardId = 'wb_' + this.props.largeVideo.stream.id.replace('-', '_');
+    
     return <Whiteboard
-              id={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
-              ref={'wb' + this.props.largeVideo.stream.id.replace('-', '_')}
+              id={whiteboardId}
+              ref={whiteboardId}
               dimensions={this.state.dimensions} 
               collaborationToolsToggle={this.props.collaborationToolsToggle} 
-              sendCommand={this.props.sendCommand} 
-              participants={this.props.participants} />;
+              sendCommand={this.sendCommand}
+              participants={this.props.participants} 
+              whiteboardData={this.state.whiteboard[whiteboardId]} />;
   },
 
   render: function() {

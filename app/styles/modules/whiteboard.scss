@@ -14,7 +14,7 @@
   height: 100%;
 
   &.pen canvas {
-    cursor: url("../images/icons/pen_toggled.svg"), default!important;
+    cursor: url("../images/icons/pen_toggled.svg") 5 35, default!important;
   }
 
   &.text canvas {
