@@ -4,7 +4,9 @@ window.$ = window.jquery = require('jquery');
 
 var Container = require('./components/container');
 
-window.config = require('../meetConfig');
+window.config = require('../jitsiServerMeetConfig');
+// window.config = require('../meetConfig');
+
 
 var APP = {
   init: function () {

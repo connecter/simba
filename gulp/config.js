@@ -5,7 +5,8 @@ var meetPath = './app/meet'
 module.exports = {
   browserSync: {
     root: dest,
-    xmppBindUrl: 'https://meet.sipxecs.org/http-bind/'
+    // xmppBindUrl: 'https://meet.sipxecs.org/http-bind/'
+    xmppBindUrl: 'https://meet.jit.si/http-bind/'
   },
   sass: {
     src: src + "/styles/",
