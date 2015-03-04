@@ -5,7 +5,7 @@ module.exports = {
     alert(title + ' - ' + msg);
   },
 
-  showError: function(titleKey, title, msgKey, msg) {
-    alert(title + ' - ' + msg);
+  showError: function(titleKey, msgKey) {
+    alert(titleKey + ' - ' + msgKey);
   }
 };
