@@ -50,12 +50,7 @@ var whiteboard = React.createClass({
       this.canvas.isDrawingMode = false;
     }
 
-    if(this.props.dimensions.width !== prevProps.dimensions.width  || 
-      this.props.dimensions.height !== prevProps.dimensions.height || 
-      this.props.dimensions.top !== prevProps.dimensions.top       ||
-      this.props.dimensions.right !== prevProps.dimensions.right   || 
-      this.props.dimensions.bottom !== prevProps.dimensions.bottom || 
-      this.props.dimensions.left !== prevProps.dimensions.left) {
+    if(!_.isEqual(this.props.dimensions, prevProps.dimensions)) {
       this.canvas.setHeight(this.props.dimensions.height);
       this.canvas.setWidth(this.props.dimensions.width);
       this.canvas.calcOffset();
@@ -90,7 +85,6 @@ var whiteboard = React.createClass({
   renderFromData: function() {
     if(this.props.whiteboardData) {
       var that = this;
-      debugger;
       _.forEach(this.props.whiteboardData, function(userData, resourceJid) {
         _.forEach(userData, function(path) {
           that.updatePath(resourceJid, path, true);

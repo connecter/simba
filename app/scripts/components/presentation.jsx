@@ -22,7 +22,7 @@ var Presentation = React.createClass({
         width: 'auto',
         height: 'auto'
       },
-      whiteboard: {}
+      whiteboards: {}
     };
   },
 
@@ -67,13 +67,13 @@ var Presentation = React.createClass({
   },
 
   interceptUpdatePath: function(whiteboardId, commandName, resourceJid, path) {
-    var newWhiteboardState = {};
+    var whiteboards = this.state.whiteboards;
 
-    newWhiteboardState[whiteboardId] = this.state.whiteboard[whiteboardId]  || {};
-    newWhiteboardState[whiteboardId][resourceJid] = newWhiteboardState[whiteboardId][resourceJid] || [];
-    newWhiteboardState[whiteboardId][resourceJid].push(path);
+    whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
+    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};   
+    whiteboards[whiteboardId][resourceJid][path.id] = path;
     
-    this.setState({whiteboard: _.assign(this.state.whiteboard, newWhiteboardState)});
+    this.setState({whiteboards: whiteboards});
   },
 
   renderWhiteboard: function() {
@@ -86,7 +86,7 @@ var Presentation = React.createClass({
               collaborationToolsToggle={this.props.collaborationToolsToggle} 
               sendCommand={this.sendCommand}
               participants={this.props.participants} 
-              whiteboardData={this.state.whiteboard[whiteboardId]} />;
+              whiteboardData={this.state.whiteboards[whiteboardId]} />;
   },
 
   render: function() {
