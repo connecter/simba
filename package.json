@@ -3,13 +3,11 @@
   "engines": {
     "node": ">=0.10.0"
   },
-
-  "browser" : {
-    "canvas" : false,
-    "jsdom":   false,
-    "xmldom":  false
+  "browser": {
+    "canvas": false,
+    "jsdom": false,
+    "xmldom": false
   },
-
   "devDependencies": {
     "apache-server-configs": "^2.7.1",
     "browser-sync": "^2.2.0",
@@ -31,8 +29,8 @@
     "hintify": "https://github.com/adhilnv/hintify/tarball/master",
     "jquery": "^2.1.3",
     "lodash": "^3.1.0",
+    "node-http-proxy": "^0.2.3",
     "pretty-hrtime": "^0.2.2",
-    "proxy-middleware": "^0.11.0",
     "react": "^0.12.2",
     "reactify": "^1.0.0",
     "require-dir": "^0.1.0",

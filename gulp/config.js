@@ -3,10 +3,12 @@ var src = './app';
 var meetPath = './app/meet'
 
 module.exports = {
-  browserSync: {
+  devServer: {
     root: dest,
-    // xmppBindUrl: 'https://meet.sipxecs.org/http-bind/'
-    xmppBindUrl: 'https://meet.jit.si/http-bind/'
+    xmpp: {
+      host: 'www.connecter.io',
+      port: 5280
+    }
   },
   sass: {
     src: src + "/styles/",
