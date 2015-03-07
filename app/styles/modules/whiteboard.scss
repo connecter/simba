@@ -23,14 +23,16 @@
 }
 
 .pointer {
+  transition: all 0.2;   
   @extend .z-index-level_-1;
   position: absolute;
   height: 40px;
   width: 40px;
   background: url("../images/icons/cursor_toggled.svg") top left no-repeat;
 
-  &.no-bg {
+  &.local {
     background: none;
+    transition: none;
 
     .name {
       top: 35px;

@@ -244,35 +244,36 @@ var whiteboard = React.createClass({
     }
   },
 
-
   handleMouseMove: function(e) {
     var x = e.pageX;
     var y = e.pageY;
 
+    this.setState({localPointer: {
+      x: x - this.props.dimensions.left,
+      y: y - this.props.dimensions.top - 40,
+      displayName: 'You'
+    }});
+
+    e.persist();
+
+    this.syncMouseMove(e);
+  },
+
+  syncMouseMove: _.throttle(function(e) {
+    var x = e.pageX;
+    var y = e.pageY;
+
     if(this.props.collaborationToolsToggle === 'pointer') {
-      var that = this;
-      
-      this.setState({localPointer: {
-        x: x - this.props.dimensions.left,
-        y: y - this.props.dimensions.top - 40,
-        displayName: 'You'
-      }});
-
-      clearTimeout(that.pointerTransmitionTimer);
-
-      this.pointerTransmitionTimer = window.setTimeout(function() {
-        that.props.sendCommand(
-          that.props.id,  // whiteboard id
-          'updatePointer', // command
-          APP.xmpp.myResource(), // resourceJid
-          (x - that.props.dimensions.left) / that.props.dimensions.width, // x
-          (y - that.props.dimensions.top) / that.props.dimensions.height // y
-        );
-      }, 20); 
+      this.props.sendCommand(
+        this.props.id,  // whiteboard id
+        'updatePointer', // command
+        APP.xmpp.myResource(), // resourceJid
+        (x - this.props.dimensions.left) / this.props.dimensions.width, // x
+        (y - this.props.dimensions.top) / this.props.dimensions.height // y
+      );
     } else 
     if(this.props.collaborationToolsToggle === 'pen' && this.isDrawing) {
       this.newPath = _.assign(this.newPath,  this.generateNewPathObj());
-
       this.props.sendCommand(
         this.props.id,  // whiteboard id
         'updatePath', // command
@@ -280,14 +281,13 @@ var whiteboard = React.createClass({
         this.newPath // new path object
       );
     }
-  },
+  }, 300, {leading: true, trailing: true}),
 
   handleMouseUp: function() {
     this.isDrawing = false;
   },
 
   handleMouseLeave: function() {
-    clearTimeout(this.pointerTransmitionTimer);
     this.isDrawing = false;
 
     if(this.props.collaborationToolsToggle === 'pointer') {
@@ -299,7 +299,6 @@ var whiteboard = React.createClass({
       );
     }
   },
-
 
   renderLocalMousePointer: function() {
     if(this.state.localPointer && this.props.collaborationToolsToggle === 'pointer') {
