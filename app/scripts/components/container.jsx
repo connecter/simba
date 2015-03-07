@@ -332,16 +332,11 @@ var Container = React.createClass({
   },
 
   renderPresentation: function() {
-    if(this.state.largeVideo.stream) {
-      return (
-        <Presentation ref="presentation" 
-                      largeVideo={this.state.largeVideo.stream}
-                      isScreen={this.state.largeVideo.isScreen}
-                      shouldFlipVideo={this.shouldFlipVideo()}
-                      collaborationToolsToggle={this.state.collaborationToolsToggle}
-                      sendCommand={this.sendCommand} participants={this.state.participants} />
-      );
-    }
+    return <Presentation ref="presentation"largeVideo={this.state.largeVideo.stream}
+                         isScreen={this.state.largeVideo.isScreen}
+                         shouldFlipVideo={this.shouldFlipVideo()}
+                         collaborationToolsToggle={this.state.collaborationToolsToggle}
+                         sendCommand={this.sendCommand} participants={this.state.participants} />;
   },
 
   renderParticipants: function() {

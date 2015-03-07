@@ -8,8 +8,8 @@ var  LargeVideo = require('./largeVideo'),
 
 var Presentation = React.createClass({
   propTypes: {
-    largeVideo: React.PropTypes.object.isRequired,
-    isScreen: React.PropTypes.bool.isRequired,
+    largeVideo: React.PropTypes.object,
+    isScreen: React.PropTypes.bool,
     sendCommand: React.PropTypes.func.isRequired,
     collaborationToolsToggle: React.PropTypes.string.isRequired,
     shouldFlipVideo: React.PropTypes.bool,
@@ -51,7 +51,7 @@ var Presentation = React.createClass({
        this.interceptReceivingCommands()[arguments[1]].apply(this, arguments);
     }
 
-    if(this.refs[arguments[0]]) {
+    if(this.refs[arguments[0]] && this.refs[arguments[0]].processCommand) {
       this.refs[arguments[0]]
           .processCommand
           .apply(this.refs[arguments[0]], Array.prototype.slice.call(arguments,1));
@@ -71,7 +71,16 @@ var Presentation = React.createClass({
 
     whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
     whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};   
-    whiteboards[whiteboardId][resourceJid][path.id] = path;
+    if(whiteboards[whiteboardId][resourceJid][path.id]) {
+      if(whiteboards[whiteboardId][resourceJid][path.id].points.length < path.length) {
+        _.forEach(path.points, function(point) {
+          whiteboards[whiteboardId][resourceJid][path.id].points.push(point);
+        });
+        whiteboards[whiteboardId][resourceJid][path.id].length = path.length;
+      }
+    } else {
+      whiteboards[whiteboardId][resourceJid][path.id] = _.cloneDeep(path);
+    }
     
     this.setState({whiteboards: whiteboards});
   },
@@ -90,16 +99,21 @@ var Presentation = React.createClass({
   },
 
   render: function() {
-    return (
-      <section className="presentation row" ref="presentationSpace">
-        {this.renderWhiteboard()}
-        <LargeVideo largeVideo={this.props.largeVideo}
-                    isScreen={this.props.isScreen}
-                    getPresentationSpaceDOMNode={this.getPresentationSpaceDOMNode}
-                    setDimensions={this.setDimensions}
-                    shouldFlipVideo={this.props.shouldFlipVideo} />
-      </section>
-    );
+    if(this.props.largeVideo) {
+      return (
+        <section className="presentation row" ref="presentationSpace">
+          {this.renderWhiteboard()}
+          <LargeVideo largeVideo={this.props.largeVideo}
+                      isScreen={this.props.isScreen}
+                      getPresentationSpaceDOMNode={this.getPresentationSpaceDOMNode}
+                      setDimensions={this.setDimensions}
+                      shouldFlipVideo={this.props.shouldFlipVideo} />
+        </section>
+      ); 
+    }
+    else {
+      return <div />;
+    }
   }
 });
 

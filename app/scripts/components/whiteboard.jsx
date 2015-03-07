@@ -182,16 +182,27 @@ var whiteboard = React.createClass({
   updatePath: function(resourceJid, path, renderLocal) {
     if(resourceJid !== APP.xmpp.myResource() || renderLocal) {
       var points = this.scalePathPointsToCurrent(path.points),
-          boundingBox = this.getPathBoundingBox(points),
-          originLeft = boundingBox.minx  + (boundingBox.maxx - boundingBox.minx) / 2,
-          originTop = boundingBox.miny  + (boundingBox.maxy - boundingBox.miny) / 2;
+          boundingBox,
+          originLeft,
+          originTop,
+          currentPath,
+          newPath;
 
-      var newPath = new fabric.Path(this.convertPointsToSVGPath(
-          points, boundingBox.minx, boundingBox.miny
-        ).join(''), { id: path.id, stroke: 'red', strokeWidth: 5, fill: null});
+      currentPath = _.find(this.canvas.getObjects(), {id: path.id});
 
-      this.canvas.remove(_.find(this.canvas.getObjects(), {id: path.id}));
+      if(currentPath) {
+        points = currentPath.pathPoints.concat(points);
+        this.canvas.remove(currentPath);
+      }
 
+      boundingBox = this.getPathBoundingBox(points);
+      originLeft = boundingBox.minx  + (boundingBox.maxx - boundingBox.minx) / 2;
+      originTop = boundingBox.miny  + (boundingBox.maxy - boundingBox.miny) / 2;
+
+      newPath = new fabric.Path(this.convertPointsToSVGPath(
+          points, boundingBox.minx, boundingBox.miny).join(''), 
+          { id: path.id, stroke: 'red', strokeWidth: 5, fill: null, pathPoints: points});
+      
       this.canvas.add(newPath);
 
       newPath.set({
@@ -213,24 +224,30 @@ var whiteboard = React.createClass({
     var that = this;
 
     return _.map(points, function(point){
-      return new fabric.Point(
-        (point.x) / that.props.dimensions.width,
-        (point.y) / that.props.dimensions.height);
-      }
-    );
+      return {
+        x: point.x / that.props.dimensions.width,
+        y: point.y / that.props.dimensions.height
+      };
+    });
   },
 
   generateNewPathObj: function() {
-    var points = this.scalePathPointsToStandard(this.canvas.freeDrawingBrush._points);
+    var brushPoints = _.clone(this.canvas.freeDrawingBrush._points),
+        pointsDiff = _.difference(this.canvas.freeDrawingBrush._points, this.prevPoints),
+        points = this.scalePathPointsToStandard(pointsDiff);
+
+    this.prevPoints = brushPoints;
 
     return {
-      points: points
+      points: points,
+      length: brushPoints.length
     };
   },
 
   handleMouseDown: function() {
     if(this.props.collaborationToolsToggle === 'pen') {
       this.isDrawing = true;
+      this.prevPoints = [];
       this.newPath = _.assign({
         id: APP.xmpp.myResource() + this.guid()
       }, this.generateNewPathObj());
