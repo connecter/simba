@@ -5,7 +5,8 @@ var React = require('react'),
     fabric = require('../vendor/fabric').fabric;
 
 
-var MousePointer = require('./mousepointer');
+var MousePointer = require('./mousepointer'),
+    CursorUtils =   require('../modules/cursorUtils');
 
 var whiteboard = React.createClass({
   propTypes: {
@@ -14,7 +15,8 @@ var whiteboard = React.createClass({
     sendCommand: React.PropTypes.func.isRequired,
     collaborationToolsToggle: React.PropTypes.string.isRequired,
     participants: React.PropTypes.object.isRequired,
-    whiteboardData: React.PropTypes.object
+    local: React.PropTypes.object.isRequired,
+    whiteboardData: React.PropTypes.object,
   },
 
   getInitialState: function () {
@@ -29,7 +31,7 @@ var whiteboard = React.createClass({
     fabric.Object.prototype.selectable = false;
     this.canvas.selection = false;
     this.canvas.freeDrawingBrush.width = 5;
-    this.canvas.freeDrawingBrush.color = '#56c1e6';
+    this.canvas.freeDrawingBrush.color = this.props.local.color;
     this.canvas.setWidth(this.props.dimensions.width);
     this.canvas.setHeight(this.props.dimensions.height);
     this.canvas.calcOffset();
@@ -49,6 +51,18 @@ var whiteboard = React.createClass({
     } else {
       this.canvas.isDrawingMode = false;
     }
+    if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
+      this.canvas.defaultCursor = this.canvas.freeDrawingCursor = 
+        "url('" + 
+        CursorUtils.get(this.props.collaborationToolsToggle, this.props.local.color) + 
+        "') " + 
+        CursorUtils.getInteractionPoint(this.props.collaborationToolsToggle) + 
+        " ,default"; 
+    } else {
+      this.canvas.defaultCursor = 'default';
+    }
+    
+    this.canvas.freeDrawingBrush.color = this.props.local.color;
 
     if(!_.isEqual(this.props.dimensions, prevProps.dimensions)) {
       this.canvas.setHeight(this.props.dimensions.height);
@@ -59,6 +73,15 @@ var whiteboard = React.createClass({
     }
 
     if(this.props.id !== prevProps.id) {
+      if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle)) {
+        this.setState({localPointer: null});
+        this.props.sendCommand(
+          this.props.id,  // whiteboard id
+          'deletePointer', // command
+          APP.xmpp.myResource() // resourceJid
+        );
+      }
+
       this.canvas.clear();
       this.renderFromData(); 
     }
@@ -87,13 +110,13 @@ var whiteboard = React.createClass({
       var that = this;
       _.forEach(this.props.whiteboardData, function(userData, resourceJid) {
         _.forEach(userData, function(path) {
-          that.updatePath(resourceJid, path, true);
+          that.updatePath(resourceJid, path, path.color, true);
         });
       });
     }
   },
 
-  updatePointer: function(resourceJid, x, y) {
+  updatePointer: function(resourceJid, x, y, type, color) {
     if(resourceJid !== APP.xmpp.myResource()) {
       var newParticipant = {};
 
@@ -101,7 +124,9 @@ var whiteboard = React.createClass({
         resourceJid: resourceJid,
         x: x * this.props.dimensions.width,
         y: y * this.props.dimensions.height - 40,
-        displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone'
+        displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone',
+        type: type,
+        color: color
       };
 
       this.setState({pariticipantsWithPointers: _.assign(this.state.pariticipantsWithPointers, newParticipant)});
@@ -179,7 +204,7 @@ var whiteboard = React.createClass({
     );
   },
 
-  updatePath: function(resourceJid, path, renderLocal) {
+  updatePath: function(resourceJid, path, color, renderLocal) {
     if(resourceJid !== APP.xmpp.myResource() || renderLocal) {
       var points = this.scalePathPointsToCurrent(path.points),
           boundingBox,
@@ -201,7 +226,7 @@ var whiteboard = React.createClass({
 
       newPath = new fabric.Path(this.convertPointsToSVGPath(
           points, boundingBox.minx, boundingBox.miny).join(''), 
-          { id: path.id, stroke: 'red', strokeWidth: 5, fill: null, pathPoints: points});
+          { id: path.id, stroke: color, strokeWidth: 5, fill: null, pathPoints: points});
       
       this.canvas.add(newPath);
 
@@ -268,7 +293,9 @@ var whiteboard = React.createClass({
     this.setState({localPointer: {
       x: x - this.props.dimensions.left,
       y: y - this.props.dimensions.top - 40,
-      displayName: 'You'
+      type: this.props.collaborationToolsToggle,
+      displayName: 'You',
+      color: this.props.local.color
     }});
 
     e.persist();
@@ -280,22 +307,26 @@ var whiteboard = React.createClass({
     var x = e.pageX;
     var y = e.pageY;
 
-    if(this.props.collaborationToolsToggle === 'pointer') {
+    if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
       this.props.sendCommand(
         this.props.id,  // whiteboard id
         'updatePointer', // command
         APP.xmpp.myResource(), // resourceJid
         (x - this.props.dimensions.left) / this.props.dimensions.width, // x
-        (y - this.props.dimensions.top) / this.props.dimensions.height // y
+        (y - this.props.dimensions.top) / this.props.dimensions.height,
+        this.props.collaborationToolsToggle,  // type
+        this.props.local.color // color
       );
-    } else 
+    }
+
     if(this.props.collaborationToolsToggle === 'pen' && this.isDrawing) {
       this.newPath = _.assign(this.newPath,  this.generateNewPathObj());
       this.props.sendCommand(
         this.props.id,  // whiteboard id
         'updatePath', // command
         APP.xmpp.myResource(), // resourceJid
-        this.newPath // new path object
+        this.newPath, // new path object,
+        this.props.local.color // color
       );
     }
   }, 300, {leading: true, trailing: true}),
@@ -306,8 +337,9 @@ var whiteboard = React.createClass({
 
   handleMouseLeave: function() {
     this.isDrawing = false;
+    this.setState({localPointer: null});
 
-    if(this.props.collaborationToolsToggle === 'pointer') {
+    if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle)) {
       this.setState({localPointer: null});
       this.props.sendCommand(
         this.props.id,  // whiteboard id
@@ -318,7 +350,7 @@ var whiteboard = React.createClass({
   },
 
   renderLocalMousePointer: function() {
-    if(this.state.localPointer && this.props.collaborationToolsToggle === 'pointer') {
+    if(this.state.localPointer && ['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
       return <MousePointer participant={this.state.localPointer} local={true} />;
     }
   },
@@ -343,8 +375,7 @@ var whiteboard = React.createClass({
         <div className={"whiteboard " + whiteboardClass}>
           {this.renderLocalMousePointer()}
           {this.renderParticipantsMousePointers()}
-          <canvas width={this.props.dimensions.width} height={this.props.dimensions.height} ref="canvas"
-                   />
+          <canvas width={this.props.dimensions.width} height={this.props.dimensions.height} ref="canvas" />
         </div>
       </div>
     );

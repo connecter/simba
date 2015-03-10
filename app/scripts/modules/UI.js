@@ -95,10 +95,13 @@ function onMucJoined(jid, info) {
   } else {
     eventEmitter.emit(UIEvents.NICKNAME_CHANGED, NicknameHandler.getNickname());
   }
+
+  var colors = ['#6FC90D', '#20AEE0', '#10C497', '#974CF4', '#FB5837', '#F12D42', '#FFA91C', '#F445AC', '#4A54FF'];
+  View.setLocalColor(colors[Math.floor(Math.random() * colors.length)]);
 }
 
 function onMucEntered(jid, id, displayName) {
-  View.addParticipant(jid, id, displayName);
+  View.addParticipant(jid, id, displayName);  
 }
 
 function onMucLeft(jid) {

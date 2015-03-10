@@ -13,7 +13,8 @@ var Presentation = React.createClass({
     sendCommand: React.PropTypes.func.isRequired,
     collaborationToolsToggle: React.PropTypes.string.isRequired,
     shouldFlipVideo: React.PropTypes.bool,
-    participants: React.PropTypes.object.isRequired
+    participants: React.PropTypes.object.isRequired,
+    local: React.PropTypes.object.isRequired
   },
 
   getInitialState: function () {
@@ -66,11 +67,11 @@ var Presentation = React.createClass({
     this.props.sendCommand.apply(this, arguments);
   },
 
-  interceptUpdatePath: function(whiteboardId, commandName, resourceJid, path) {
+  interceptUpdatePath: function(whiteboardId, commandName, resourceJid, path, color) {
     var whiteboards = this.state.whiteboards;
 
     whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
-    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};   
+    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};
     if(whiteboards[whiteboardId][resourceJid][path.id]) {
       if(whiteboards[whiteboardId][resourceJid][path.id].points.length < path.length) {
         _.forEach(path.points, function(point) {
@@ -81,6 +82,8 @@ var Presentation = React.createClass({
     } else {
       whiteboards[whiteboardId][resourceJid][path.id] = _.cloneDeep(path);
     }
+
+    whiteboards[whiteboardId][resourceJid][path.id].color = color;
     
     this.setState({whiteboards: whiteboards});
   },
@@ -95,7 +98,8 @@ var Presentation = React.createClass({
               collaborationToolsToggle={this.props.collaborationToolsToggle} 
               sendCommand={this.sendCommand}
               participants={this.props.participants} 
-              whiteboardData={this.state.whiteboards[whiteboardId]} />;
+              whiteboardData={this.state.whiteboards[whiteboardId]}
+              local={this.props.local} />;
   },
 
   render: function() {

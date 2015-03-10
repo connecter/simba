@@ -86,6 +86,13 @@ var Container = React.createClass({
     this.setState({local: newLocal});
   },
 
+  setLocalColor: function(color) {
+    var newLocal = this.state.local;
+        
+    newLocal.color = color;
+    this.setState({local: newLocal});
+  },
+
   toggleVideo: function() {
     var that = this;
 
@@ -334,6 +341,7 @@ var Container = React.createClass({
   renderPresentation: function() {
     return <Presentation ref="presentation"largeVideo={this.state.largeVideo.stream}
                          isScreen={this.state.largeVideo.isScreen}
+                         local={this.state.local}
                          shouldFlipVideo={this.shouldFlipVideo()}
                          collaborationToolsToggle={this.state.collaborationToolsToggle}
                          sendCommand={this.sendCommand} participants={this.state.participants} />;

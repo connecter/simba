@@ -12,41 +12,44 @@
   position: relative;
   width: 100%;
   height: 100%;
-
-  &.pen canvas {
-    cursor: url("../images/icons/pen_toggled.svg") 5 35, default!important;
-  }
-
-  &.text canvas {
-    cursor: url("../images/icons/text_toggled.svg"), default!important;
-  }
 }
 
 .pointer {
   transition: all 0.3s;   
   @extend .z-index-level_-1;
   position: absolute;
-  height: 40px;
-  width: 40px;
-  background: url("../images/icons/cursor_toggled.svg") top left no-repeat;
-
-  &.local {
-    background: none;
-    transition: none;
-
-    .name {
-      top: 35px;
-      left: 20px;  
-    }
-  }
-
+  height: 18px;
+  width: 12px;
+  
   .name {
     position: relative;
-    top: 45px;
-    left: 20px;
+    top: -5px;
+    left: 14px;
     color: #fff;
-    padding: 1px 3px;
+    padding: 1px 4px;
     background-color: #000;
-    font-size: 14px;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+
+  &.pen .name {
+    top: -12px;
+    left: 25px; 
+  }  
+
+  &.local {
+    transition: none;
+    
+    .name {
+      top: 10px;
+      left: 16px;  
+    }
+
+    &.pen .name {
+      top: -3px;
+      left: 17px; 
+    }
   }
 }
+
+
