@@ -1,6 +1,6 @@
 $buttons-list: "add", "arrow-left", "arrow-right", "arrow-small-left", "arrow-small-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo";
 
-$buttons-with-toggled-state-list: "add", "attach", "chat", "clear", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "snapshot", "text", "camera";
+$buttons-with-toggled-state-list: "add", "attach", "chat", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "text", "camera";
 
 $buttons-with-disabled-state-list: "clear", "undo";
 
@@ -34,6 +34,13 @@ $primary-button-bg: #3bafda;
   &:active {
     background-image: url("../images/icons/#{$icon}_active.svg");
   }
+
+  &:after {
+    display: none;
+    content:
+    url("../images/icons/#{$icon}_hover.svg")
+    url("../images/icons/#{$icon}_active.svg");
+  }
 }
 
 @each $button in $buttons-list {
@@ -46,6 +53,14 @@ $primary-button-bg: #3bafda;
   .btn-#{$button} {
     &.is-toggled {
       background-image: url("../images/icons/#{$button}_toggled.svg");
+    }
+
+    &:after {
+      display: none;
+      content:
+      url("../images/icons/#{$button}_hover.svg")
+      url("../images/icons/#{$button}_active.svg")
+      url("../images/icons/#{$button}_toggled.svg");
     }
   }
 }
