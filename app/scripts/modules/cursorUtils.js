@@ -51,14 +51,18 @@ var CursorUtils = {
             '</svg>').replace('%color', color);
   },
 
-  getInteractionPoint: function(type, color) {
+  getInteractionPoint: function(type, local) {
+    if(local) {
+      return {x: 0, y: 0};
+    }
+
     switch(type) {
       case 'pointer':
-        return  "0 0";
+        return  {x: 0, y: 0};
       case 'pen':
-        return "8 24";
+        return {x: 8, y: 24};
       case 'text':
-        return '0 0';
+        return {x: 0, y: 0};
     }
   },
 };

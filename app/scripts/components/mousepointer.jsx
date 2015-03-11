@@ -16,23 +16,8 @@ var MousePointer = React.createClass({
     }
   },
 
-  getInteractionPoint: function(type) {
-    if(this.props.local) {
-      return {x: 0, y: 0};
-    }
-
-    switch(type) {
-      case 'pointer':
-        return  {x: 0, y: 0};
-      case 'pen':
-        return {x: 8, y: 32};
-      case 'text':
-        return {x: 0, y: 0};
-    }
-  },
-
   render: function() {
-    var interactionPoint = this.getInteractionPoint(this.props.participant.type);
+    var interactionPoint = CursorUtils.getInteractionPoint(this.props.participant.type, this.props.local);
 
 
     var pointerStyle = {

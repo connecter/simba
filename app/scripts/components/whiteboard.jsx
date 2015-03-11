@@ -52,11 +52,13 @@ var whiteboard = React.createClass({
       this.canvas.isDrawingMode = false;
     }
     if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
+      var interactionPoint = CursorUtils.getInteractionPoint(this.props.collaborationToolsToggle);
+
       this.canvas.defaultCursor = this.canvas.freeDrawingCursor = 
         "url('" + 
         CursorUtils.get(this.props.collaborationToolsToggle, this.props.local.color) + 
         "') " + 
-        CursorUtils.getInteractionPoint(this.props.collaborationToolsToggle) + 
+        interactionPoint.x + ' ' + interactionPoint.y +
         " ,default"; 
     } else {
       this.canvas.defaultCursor = 'default';
@@ -123,7 +125,7 @@ var whiteboard = React.createClass({
       newParticipant['participant_' + resourceJid] = {
         resourceJid: resourceJid,
         x: x * this.props.dimensions.width,
-        y: y * this.props.dimensions.height - 40,
+        y: y * this.props.dimensions.height,
         displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone',
         type: type,
         color: color
@@ -307,13 +309,13 @@ var whiteboard = React.createClass({
     var x = e.pageX;
     var y = e.pageY;
 
-    if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
+    if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1 && !this.isDrawing) {
       this.props.sendCommand(
         this.props.id,  // whiteboard id
         'updatePointer', // command
         APP.xmpp.myResource(), // resourceJid
         (x - this.props.dimensions.left) / this.props.dimensions.width, // x
-        (y - this.props.dimensions.top) / this.props.dimensions.height,
+        (y - this.props.dimensions.top - 40) / this.props.dimensions.height,
         this.props.collaborationToolsToggle,  // type
         this.props.local.color // color
       );
@@ -329,7 +331,7 @@ var whiteboard = React.createClass({
         this.props.local.color // color
       );
     }
-  }, 300, {leading: true, trailing: true}),
+  }, 50, {leading: true, trailing: true}),
 
   handleMouseUp: function() {
     this.isDrawing = false;

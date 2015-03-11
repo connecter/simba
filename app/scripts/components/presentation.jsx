@@ -84,6 +84,15 @@ var Presentation = React.createClass({
     }
 
     whiteboards[whiteboardId][resourceJid][path.id].color = color;
+
+    if(this.refs[whiteboardId] &&
+      this.refs[whiteboardId].processCommand && 
+      whiteboards[whiteboardId][resourceJid][path.id].points.length) {
+      var lastPoint = whiteboards[whiteboardId][resourceJid][path.id].points[whiteboards[whiteboardId][resourceJid][path.id].points.length - 1];
+      this.refs[whiteboardId]
+          .processCommand
+          .call(this.refs[whiteboardId], 'updatePointer', resourceJid, lastPoint.x, lastPoint.y, 'pen', color);
+    }  
     
     this.setState({whiteboards: whiteboards});
   },
