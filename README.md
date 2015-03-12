@@ -78,17 +78,20 @@ Test the connection:
 ```
 fleetctl list-machines
 ```
-8) Start the container
+8) Load the service templates
 ```
-mv priderock/simba\@.service simba.service
-fleetctl load simba.service
-fleetctl start simba.service
+fleetctl submit priderock/simba\@.service
+fleetctl list-unit-files
+
+9) Start the container
+```
+fleetctl start simba1.service
 ```
 Make sure it downloads the correct container from Docker Hub. The container name is in the service file.
 
 Check status
 ```
-fleetctl status simba.service
+fleetctl status simba1.service
 fleetctl list-machines
 vagrant status
 ```
