@@ -82,7 +82,7 @@ fleetctl list-machines
 ```
 fleetctl submit priderock/simba\@.service
 fleetctl list-unit-files
-
+```
 9) Start the container
 ```
 fleetctl start simba1.service
