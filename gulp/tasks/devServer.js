@@ -6,6 +6,10 @@ var httpProxy = require('http-proxy');
 var https = require('https');
 var url         = require('url');
 var fs = require('fs');
+var proxyMiddleware = require('proxy-middleware')
+
+var proxyOptions = url.parse(config.xmppBosh);
+proxyOptions.route = '/http-bind/';
 
 gulp.task('devServer', function() {
   var proxy = new httpProxy.createProxyServer({
@@ -35,7 +39,8 @@ gulp.task('devServer', function() {
       https: true,
       baseDir: config.root,
       middleware: [
-        modRewrite(['^/([a-zA-Z0-9]+)$ /index.html'])
+        modRewrite(['^/([a-zA-Z0-9]+)$ /index.html']),
+        proxyMiddleware(proxyOptions)
       ]
     }
   });

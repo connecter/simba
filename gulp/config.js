@@ -8,7 +8,10 @@ module.exports = {
     xmpp: {
       host: 'www.connecter.io',
       port: 5280
-    }
+    },
+
+    xmppBosh: 'http://www.connecter.io/http-bind/'
+
   },
   sass: {
     src: src + "/styles/",
