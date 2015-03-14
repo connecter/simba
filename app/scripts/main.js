@@ -17,7 +17,7 @@ var APP = {
     this.desktopsharing = require("../meet/modules/desktopsharing/desktopsharing");
 
     APP.RTC.start();
-    APP.xmpp.start({});
+    APP.xmpp.start();
     APP.statistics.start();
     APP.connectionquality.init();
     APP.desktopsharing.init();
