@@ -4,6 +4,7 @@ var React = require('react'),
     _ = require('lodash'),
     fabric = require('../vendor/fabric').fabric;
 
+window.fabric = fabric;
 
 var MousePointer = require('./mousepointer'),
     CursorUtils =   require('../modules/cursorUtils');
@@ -29,6 +30,14 @@ var whiteboard = React.createClass({
     this.canvas = new fabric.Canvas(this.refs.canvas.getDOMNode());
     window.o = this.canvas;
     fabric.Object.prototype.selectable = false;
+    fabric.Object.prototype.hasRotatingPoint = false;
+    fabric.Object.prototype.hasControls = false;
+    fabric.IText.prototype.editable = false;
+    fabric.IText.prototype.selectable = false;
+    fabric.IText.prototype.editingBorderColor = 'rgba(0,0,0,0)';
+    fabric.IText.prototype.borderColor = 'rgba(0,0,0,0)';
+    fabric.IText.prototype.lockMovementX = true;
+    fabric.IText.prototype.lockMovementY = true;
     this.canvas.selection = false;
     this.canvas.freeDrawingBrush.width = 5;
     this.canvas.freeDrawingBrush.color = this.props.local.color;
@@ -42,6 +51,10 @@ var whiteboard = React.createClass({
       this.canvas.isDrawingMode = false;
     }
 
+    if(this.props.collaborationToolsToggle === 'text') {
+      this.setupTextTool();
+    }
+
     this.renderFromData();
   },
 
@@ -51,17 +64,18 @@ var whiteboard = React.createClass({
     } else {
       this.canvas.isDrawingMode = false;
     }
+
     if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1) {
       var interactionPoint = CursorUtils.getInteractionPoint(this.props.collaborationToolsToggle);
 
-      this.canvas.defaultCursor = this.canvas.freeDrawingCursor = 
+      this.canvas.moveCursor = this.canvas.hoverCursor = this.canvas.defaultCursor = this.canvas.freeDrawingCursor = 
         "url('" + 
         CursorUtils.get(this.props.collaborationToolsToggle, this.props.local.color) + 
         "') " + 
         interactionPoint.x + ' ' + interactionPoint.y +
         " ,default"; 
     } else {
-      this.canvas.defaultCursor = 'default';
+      this.canvas.moveCursor = this.canvas.hoverCursor = this.canvas.defaultCursor = this.canvas.freeDrawingCursor = 'default';
     }
     
     this.canvas.freeDrawingBrush.color = this.props.local.color;
@@ -87,13 +101,22 @@ var whiteboard = React.createClass({
       this.canvas.clear();
       this.renderFromData(); 
     }
+
+    if(prevProps.collaborationToolsToggle !== 'text' && this.props.collaborationToolsToggle === 'text') {
+      this.setupTextTool();
+    } 
+
+    if(this.props.collaborationToolsToggle !== 'text' && prevProps.collaborationToolsToggle === 'text') {
+      this.cleanupTextTool();
+    }
   },
 
   commands: function() {
     return {
-      updatePointer: this.updatePointer,
+      syncPointer: this.syncPointer,
       deletePointer: this.deletePointer,
-      updatePath: this.updatePath
+      syncPath: this.syncPath,
+      syncText: this.syncText
     };
   },
 
@@ -111,14 +134,18 @@ var whiteboard = React.createClass({
     if(this.props.whiteboardData) {
       var that = this;
       _.forEach(this.props.whiteboardData, function(userData, resourceJid) {
-        _.forEach(userData, function(path) {
-          that.updatePath(resourceJid, path, path.color, true);
+        _.forEach(userData.paths, function(path) {
+          that.syncPath(resourceJid, path, path.color, true);
+        });
+
+        _.forEach(userData.texts, function(text) {
+          that.syncText(resourceJid, text.text, text.color, true);
         });
       });
     }
   },
 
-  updatePointer: function(resourceJid, x, y, type, color) {
+  syncPointer: function(resourceJid, x, y, type, color) {
     if(resourceJid !== APP.xmpp.myResource()) {
       var newParticipant = {};
 
@@ -206,7 +233,7 @@ var whiteboard = React.createClass({
     );
   },
 
-  updatePath: function(resourceJid, path, color, renderLocal) {
+  syncPath: function(resourceJid, path, color, renderLocal) {
     if(resourceJid !== APP.xmpp.myResource() || renderLocal) {
       var points = this.scalePathPointsToCurrent(path.points),
           boundingBox,
@@ -241,6 +268,41 @@ var whiteboard = React.createClass({
     }
   },
 
+  syncText: function(resourceJid, text, color, renderLocal) {
+    var textObj, 
+        TextType;
+
+    if(resourceJid !== APP.xmpp.myResource() || renderLocal) {
+      textObj = _.find(this.canvas.getObjects(), {id: text.id});
+      TextType = resourceJid === APP.xmpp.myResource() ? fabric.IText : fabric.Text;
+      
+      if(!textObj) {
+        textObj = new TextType('', {id: text.id});
+        this.canvas.add(textObj);
+      }
+
+      textObj.set({
+        top: text.top * this.props.dimensions.height,
+        left: text.left * this.props.dimensions.width,
+        text: text.text,
+        fill: color,
+        fontSize: 20,
+        fontFamily: 'Titillium Web'
+      });
+
+      this.canvas.renderAll();
+
+      if(TextType === fabric.IText) {
+        textObj.set({cursorColor: color});
+        this.bindITextChanged(textObj);
+        
+        if(this.props.collaborationToolsToggle === 'text') {
+          textObj.editable = true;
+        }
+      }
+    }
+  },
+
   processCommand: function() {
     if(this.commands()[arguments[0]]) {
       this.commands()[arguments[0]].apply(this, Array.prototype.slice.call(arguments,1));
@@ -258,7 +320,7 @@ var whiteboard = React.createClass({
     });
   },
 
-  generateNewPathObj: function() {
+  generatePathObj: function() {
     var brushPoints = _.clone(this.canvas.freeDrawingBrush._points),
         pointsDiff = _.difference(this.canvas.freeDrawingBrush._points, this.prevPoints),
         points = this.scalePathPointsToStandard(pointsDiff);
@@ -271,17 +333,77 @@ var whiteboard = React.createClass({
     };
   },
 
-  handleMouseDown: function() {
+  setupTextTool: function() {
+    _.forEach(fabric.IText.instances, function(obj) {
+      obj.exitEditing();
+      obj.editable = true;
+    });
+
+    this.canvas.on('mouse:up', function(e) {
+      if(this.props.collaborationToolsToggle === 'text') {
+        _.forEach(fabric.IText.instances, function(obj) {
+          obj.exitEditing();
+        });
+        if(!e.target || e.target.get('type')!=='i-text') {
+          var iText = new fabric.IText('', {
+            left: e.e.offsetX,
+            top: e.e.offsetY,
+            id: APP.xmpp.myResource() + this.guid(),
+            fill: this.props.local.color,
+            cursorColor: this.props.local.color,
+            fontSize: 20,
+            fontFamily: 'Titillium Web'
+          });
+
+          iText.editable = true;
+          this.canvas.add(iText);
+          this.canvas.setActiveObject(iText);
+          iText.enterEditing();
+          this.bindITextChanged(iText);
+        } else
+        if(e.target.get('type')==='i-text') {
+          this.canvas.setActiveObject(e.target);
+          e.target.enterEditing();
+          window.setTimeout(function() {
+            e.target.setCursorByClick(e.e);
+            e.target.initDelayedCursor(true);
+          }, 0);
+        }
+      }
+    }.bind(this));
+  },
+
+  bindITextChanged: function(iText) {
+    iText.on('changed', function() {
+      this.props.sendCommand(
+        this.props.id,  // whiteboard id
+        'syncText', // command
+        APP.xmpp.myResource(), // resourceJid
+        { id: iText.id, text: _.clone(iText.text), top: iText.top / this.props.dimensions.height, left: iText.left / this.props.dimensions.width}, // text
+        this.props.local.color // color
+      );
+    }.bind(this));
+  },
+
+  cleanupTextTool: function() {
+    this.canvas.off('mouse:up');
+    _.forEach(fabric.IText.instances, function(obj) {
+      obj.exitEditing();
+      obj.editable = false;
+    });
+  },
+
+  handleMouseDown: function(e) {
     if(this.props.collaborationToolsToggle === 'pen') {
       this.isDrawing = true;
       this.prevPoints = [];
       this.newPath = _.assign({
         id: APP.xmpp.myResource() + this.guid()
-      }, this.generateNewPathObj());
+      }, this.generatePathObj());
 
       this.props.sendCommand(
         this.props.id,  // whiteboard id
-        'updatePath', // command
+        'syncPath', // command
         APP.xmpp.myResource(), // resourceJid
         this.newPath // new path object
       );
@@ -289,8 +411,8 @@ var whiteboard = React.createClass({
   },
 
   handleMouseMove: function(e) {
-    var x = e.pageX;
-    var y = e.pageY;
+    var x = e.pageX,
+        y = e.pageY;
 
     this.setState({localPointer: {
       x: x - this.props.dimensions.left,
@@ -312,7 +434,7 @@ var whiteboard = React.createClass({
     if(['pointer', 'pen', 'text'].indexOf(this.props.collaborationToolsToggle) > -1 && !this.isDrawing) {
       this.props.sendCommand(
         this.props.id,  // whiteboard id
-        'updatePointer', // command
+        'syncPointer', // command
         APP.xmpp.myResource(), // resourceJid
         (x - this.props.dimensions.left) / this.props.dimensions.width, // x
         (y - this.props.dimensions.top - 40) / this.props.dimensions.height,
@@ -322,10 +444,10 @@ var whiteboard = React.createClass({
     }
 
     if(this.props.collaborationToolsToggle === 'pen' && this.isDrawing) {
-      this.newPath = _.assign(this.newPath,  this.generateNewPathObj());
+      this.newPath = _.assign(this.newPath,  this.generatePathObj());
       this.props.sendCommand(
         this.props.id,  // whiteboard id
-        'updatePath', // command
+        'syncPath', // command
         APP.xmpp.myResource(), // resourceJid
         this.newPath, // new path object,
         this.props.local.color // color

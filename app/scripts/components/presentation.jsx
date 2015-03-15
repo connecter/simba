@@ -37,13 +37,15 @@ var Presentation = React.createClass({
 
   interceptSendingCommands: function() {
     return {
-      updatePath: this.interceptUpdatePath
+      syncPath: this.interceptSyncPath,
+      syncText: this.interceptSyncText
     };
   },
 
   interceptReceivingCommands: function() {
     return {
-      updatePath: this.interceptUpdatePath
+      syncPath: this.interceptSyncPath,
+      syncText: this.interceptSyncText
     };
   },
 
@@ -67,33 +69,44 @@ var Presentation = React.createClass({
     this.props.sendCommand.apply(this, arguments);
   },
 
-  interceptUpdatePath: function(whiteboardId, commandName, resourceJid, path, color) {
+  interceptSyncPath: function(whiteboardId, commandName, resourceJid, path, color) {
     var whiteboards = this.state.whiteboards;
 
     whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
     whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};
-    if(whiteboards[whiteboardId][resourceJid][path.id]) {
-      if(whiteboards[whiteboardId][resourceJid][path.id].points.length < path.length) {
+    whiteboards[whiteboardId][resourceJid].paths = whiteboards[whiteboardId][resourceJid].paths || {};
+    if(whiteboards[whiteboardId][resourceJid].paths[path.id]) {
+      if(whiteboards[whiteboardId][resourceJid].paths[path.id].points.length < path.length) {
         _.forEach(path.points, function(point) {
-          whiteboards[whiteboardId][resourceJid][path.id].points.push(point);
+          whiteboards[whiteboardId][resourceJid].paths[path.id].points.push(point);
         });
-        whiteboards[whiteboardId][resourceJid][path.id].length = path.length;
+        whiteboards[whiteboardId][resourceJid].paths[path.id].length = path.length;
       }
     } else {
-      whiteboards[whiteboardId][resourceJid][path.id] = _.cloneDeep(path);
+      whiteboards[whiteboardId][resourceJid].paths[path.id] = _.cloneDeep(path);
     }
 
-    whiteboards[whiteboardId][resourceJid][path.id].color = color;
+    whiteboards[whiteboardId][resourceJid].paths[path.id].color = color;
 
     if(this.refs[whiteboardId] &&
       this.refs[whiteboardId].processCommand && 
-      whiteboards[whiteboardId][resourceJid][path.id].points.length) {
-      var lastPoint = whiteboards[whiteboardId][resourceJid][path.id].points[whiteboards[whiteboardId][resourceJid][path.id].points.length - 1];
+      whiteboards[whiteboardId][resourceJid].paths[path.id].points.length) {
+      var lastPoint = whiteboards[whiteboardId][resourceJid].paths[path.id].points[whiteboards[whiteboardId][resourceJid].paths[path.id].points.length - 1];
       this.refs[whiteboardId]
           .processCommand
-          .call(this.refs[whiteboardId], 'updatePointer', resourceJid, lastPoint.x, lastPoint.y, 'pen', color);
+          .call(this.refs[whiteboardId], 'syncPointer', resourceJid, lastPoint.x, lastPoint.y, 'pen', color);
     }  
     
+    this.setState({whiteboards: whiteboards});
+  }, 
+
+  interceptSyncText: function(whiteboardId, commandName, resourceJid, text, color) {
+    var whiteboards = this.state.whiteboards;
+
+    whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
+    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};
+    whiteboards[whiteboardId][resourceJid].texts = whiteboards[whiteboardId][resourceJid].texts || {};
+    whiteboards[whiteboardId][resourceJid].texts[text.id] = {text: _.cloneDeep(text), color: color};
     this.setState({whiteboards: whiteboards});
   },
 
