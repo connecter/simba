@@ -8,7 +8,9 @@ var Footer = React.createClass({
   propTypes: {
     execCommand: React.PropTypes.func.isRequired,
     callControlToggles: React.PropTypes.object.isRequired, 
-    collaborationToolsToggle: React.PropTypes.string.isRequired
+    collaborationToolsToggle: React.PropTypes.string.isRequired,
+    hasUndo: React.PropTypes.number.isRequired,
+    canClear: React.PropTypes.bool.isRequired
   },
   getInitialState: function() {
     return {isToolbarExpanded: false, isScreenshareOpen: false};
@@ -90,6 +92,14 @@ var Footer = React.createClass({
       screenshareText = cx({
         'Share screen': !this.props.callControlToggles.screenStream,
         'Turn screen sharing off': this.props.callControlToggles.screenStream
+      }),
+
+      undoButtonClasses = cx({
+        'is-disabled': !this.props.hasUndo
+      }),
+
+      clearButtonClasses = cx({
+        'is-disabled': !this.props.canClear
       });
 
     return (
@@ -101,8 +111,8 @@ var Footer = React.createClass({
             <li><button className={"btn-icon btn-cursor " + pointerButtonClasses} title={pointerButtonText} onClick={this.props.execCommand("togglePointer")}><span className="sr-only">{pointerButtonText}</span></button></li>
             <li><button className={"btn-icon btn-pen " + penButtonClasses} title={penButtonText} onClick={this.props.execCommand("togglePen")}><span className="sr-only">{penButtonText}</span></button></li>
             <li><button className={"btn-icon btn-text " + textButtonClasses} title={textButtonText} onClick={this.props.execCommand("toggleText")}><span className="sr-only">{textButtonText}</span></button></li>
-            <li><button className="btn-icon btn-undo" title="Undo"><span className="sr-only">Undo</span></button></li>
-            <li><button className="btn-icon btn-clear" title="Clear"><span className="sr-only">Clear</span></button></li>
+            <li><button className={"btn-icon btn-undo " + undoButtonClasses} title="Undo" onClick={this.props.execCommand("undo")}><span className="sr-only">Undo</span></button></li>
+            <li><button className={"btn-icon btn-clear " + clearButtonClasses} title="Clear" onClick={this.props.execCommand("clear")}><span className="sr-only">Clear</span></button></li>
             <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>
           </ul>
           <button className={"btn-icon pull-left " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>

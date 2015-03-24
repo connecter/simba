@@ -19,7 +19,9 @@ var Container = React.createClass({
       },
       local: {jid:'local'},
       callControlToggles: {},
-      collaborationToolsToggle: ''
+      collaborationToolsToggle: '',
+      hasUndo: 0,
+      canClear: false
     };
   },
 
@@ -136,6 +138,24 @@ var Container = React.createClass({
 
   toggleText: function() {
     this.setState({collaborationToolsToggle: this.state.collaborationToolsToggle === 'text' ? '' : 'text'});
+  },
+
+  undo: function() {
+    this.refs.presentation.undo();
+  },
+
+  clear: function() {
+    if(this.state.canClear) {
+      this.refs.presentation.clear();
+    }
+  },
+
+  setHasUndo: function(hasUndo) {
+    this.setState({hasUndo: hasUndo});
+  },
+  
+  setCanClear: function(canClear) {
+    this.setState({canClear: canClear});
   },
 
   execCommand: function(command) {
@@ -344,7 +364,11 @@ var Container = React.createClass({
                          local={this.state.local}
                          shouldFlipVideo={this.shouldFlipVideo()}
                          collaborationToolsToggle={this.state.collaborationToolsToggle}
-                         sendCommand={this.sendCommand} participants={this.state.participants} />;
+                         sendCommand={this.sendCommand} participants={this.state.participants} 
+                         hasUndo={this.state.hasUndo}
+                         setHasUndo={this.setHasUndo}
+                         canClear={this.state.canClear}
+                         setCanClear={this.setCanClear} />;
   },
 
   renderParticipants: function() {
@@ -364,7 +388,7 @@ var Container = React.createClass({
         {this.renderPresentation()}
         {this.renderParticipants()}
         <Discussions></Discussions>
-        <Footer execCommand={this.execCommand} callControlToggles={this.state.callControlToggles} collaborationToolsToggle={this.state.collaborationToolsToggle}></Footer>
+        <Footer execCommand={this.execCommand} callControlToggles={this.state.callControlToggles} collaborationToolsToggle={this.state.collaborationToolsToggle} hasUndo={this.state.hasUndo} canClear={this.state.canClear}></Footer>
       </div>
     );
   }

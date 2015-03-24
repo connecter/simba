@@ -4,7 +4,8 @@ var React = require('react/addons'),
     _ = require('lodash');  
 
 var  LargeVideo = require('./largeVideo'),
-    Whiteboard = require('./whiteboard');
+    Whiteboard = require('./whiteboard'),
+    UndoManager = require('../modules/UndoManager');
 
 var Presentation = React.createClass({
   propTypes: {
@@ -14,18 +15,67 @@ var Presentation = React.createClass({
     collaborationToolsToggle: React.PropTypes.string.isRequired,
     shouldFlipVideo: React.PropTypes.bool,
     participants: React.PropTypes.object.isRequired,
-    local: React.PropTypes.object.isRequired
+    local: React.PropTypes.object.isRequired,
+    hasUndo: React.PropTypes.number.isRequired,
+    setHasUndo: React.PropTypes.func.isRequired,
+    canClear: React.PropTypes.bool.isRequired,
+    setCanClear: React.PropTypes.func.isRequired
   },
 
   getInitialState: function () {
-    return {
+    var initialState = {
       dimensions: {
         width: 'auto',
         height: 'auto'
       },
-      whiteboards: {}
+      whiteboards: {},
+      whiteboardsCache: {},
+      undoManagers: {}
     };
+
+    if(this.props.largeVideo && this.props.largeVideo.stream) {
+      initialState = _.assign(initialState, {
+        currentWhiteboardId: this.props.largeVideo.stream.id.replace('-', '_')
+      });
+    }
+
+    this.prevCommand = [];
+
+    return initialState;
   },
+
+
+  componentDidUpdate: function (prevProps, prevState) {
+
+    if(this.props.largeVideo && this.props.largeVideo.stream) {
+      if(this.state.currentWhiteboardId !== this.props.largeVideo.stream.id.replace('-', '_')) {
+        this.setState({currentWhiteboardId: this.props.largeVideo.stream.id.replace('-', '_')});
+      }
+    } else if(this.state.currentWhiteboardId) {
+      this.setState({currentWhiteboardId: null});
+    }
+
+    if(this.state.undoManagers[this.state.currentWhiteboardId] && (this.state.undoManagers[this.state.currentWhiteboardId].hasUndo() !== this.props.hasUndo)) {
+      this.props.setHasUndo(this.state.undoManagers[this.state.currentWhiteboardId].hasUndo());
+    } else if(!this.state.undoManagers[this.state.currentWhiteboardId] && this.props.hasUndo) {
+      this.props.setHasUndo(0);
+    }
+
+    var resourceJid = APP.xmpp.myResource(),
+        whiteboardId = this.state.currentWhiteboardId,
+        whiteboards = this.state.whiteboards,
+        canClear;
+
+    if(!_.isEmpty(whiteboards[whiteboardId])) {
+      canClear = true;
+    } else {
+      canClear = false;
+    }
+
+    if(canClear !== this.props.canClear) {
+      this.props.setCanClear(canClear);
+    }
+  }, 
 
   getPresentationSpaceDOMNode: function() {
     return this.refs.presentationSpace.getDOMNode();
@@ -35,23 +85,64 @@ var Presentation = React.createClass({
     this.setState({dimensions: dimensions});
   },
 
-  interceptSendingCommands: function() {
-    return {
-      syncPath: this.interceptSyncPath,
-      syncText: this.interceptSyncText
-    };
-  },
-
   interceptReceivingCommands: function() {
     return {
       syncPath: this.interceptSyncPath,
-      syncText: this.interceptSyncText
+      syncText: this.interceptSyncText,
+      removeObject: this.interceptRemoveObject,
+      clearWhiteboard: this.cacheAndClear,
+      undoClear: this.restoreFromCache
     };
+  },
+
+  interceptSendingCommands: function() {
+    return {
+      syncPath: this.generateUndoSyncPath,
+      syncText: this.generateUndoSyncText,
+      clearWhiteboard: this.generateUndoClear
+    };
+  },
+
+  undo: function() {
+    if(this.state.undoManagers[this.state.currentWhiteboardId] && this.state.undoManagers[this.state.currentWhiteboardId].hasUndo()) {
+      this.state.undoManagers[this.state.currentWhiteboardId].undo();
+      this.props.setHasUndo(this.state.undoManagers[this.state.currentWhiteboardId].hasUndo());
+    }
+  },
+
+  clear: function() {
+    this.sendCommand(this.state.currentWhiteboardId, 'clearWhiteboard');
+  },
+
+  cacheAndClear: function(whiteboardId, commandName) {
+    if(this.state.currentWhiteboardId && this.state.whiteboards[this.state.currentWhiteboardId]) {
+
+        var whiteboards = this.state.whiteboards,
+            whiteboardsCache = this.state.whiteboardsCache;
+
+        whiteboardsCache[this.state.currentWhiteboardId] = whiteboardsCache[this.state.currentWhiteboardId] || [];
+        whiteboardsCache[this.state.currentWhiteboardId].push(this.state.whiteboards[this.state.currentWhiteboardId]);
+        this.state.whiteboards[this.state.currentWhiteboardId] = {};
+        this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
+
+        this.refs[this.state.currentWhiteboardId].renderFromData();
+    }
+  },
+
+  restoreFromCache: function(whiteboardId, commandName) {
+    var whiteboards = this.state.whiteboards,
+        whiteboardsCache = this.state.whiteboardsCache;
+
+    whiteboardsCache = this.state.whiteboardsCache;
+    whiteboardsCache[whiteboardId] = whiteboardsCache[whiteboardId] || [];
+    whiteboards[this.state.currentWhiteboardId] = _.assign(whiteboards[this.state.currentWhiteboardId], whiteboardsCache[whiteboardId].pop());
+    this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
+    this.refs[this.state.currentWhiteboardId].renderFromData();
   },
 
   processCommand: function() {
     if(this.interceptReceivingCommands()[arguments[1]]) {
-       this.interceptReceivingCommands()[arguments[1]].apply(this, arguments);
+      this.interceptReceivingCommands()[arguments[1]].apply(this, arguments);
     }
 
     if(this.refs[arguments[0]] && this.refs[arguments[0]].processCommand) {
@@ -63,65 +154,126 @@ var Presentation = React.createClass({
 
   sendCommand: function() {
     if(this.interceptSendingCommands()[arguments[1]]) {
-     this.interceptSendingCommands()[arguments[1]].apply(this, arguments);
+      this.interceptSendingCommands()[arguments[1]].apply(this, arguments);
     }
+    
+    this.prevCommand = arguments;
     
     this.props.sendCommand.apply(this, arguments);
   },
 
-  interceptSyncPath: function(whiteboardId, commandName, resourceJid, path, color) {
+  interceptSyncPath: function(whiteboardId, commandName, path, color) {
     var whiteboards = this.state.whiteboards;
 
     whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
-    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};
-    whiteboards[whiteboardId][resourceJid].paths = whiteboards[whiteboardId][resourceJid].paths || {};
-    if(whiteboards[whiteboardId][resourceJid].paths[path.id]) {
-      if(whiteboards[whiteboardId][resourceJid].paths[path.id].points.length < path.length) {
+
+    if(whiteboards[whiteboardId][path.id]) {
+      if(whiteboards[whiteboardId][path.id].points.length < path.length) {
         _.forEach(path.points, function(point) {
-          whiteboards[whiteboardId][resourceJid].paths[path.id].points.push(point);
+          whiteboards[whiteboardId][path.id].points.push(point);
         });
-        whiteboards[whiteboardId][resourceJid].paths[path.id].length = path.length;
+        whiteboards[whiteboardId][path.id].length = path.length;
       }
     } else {
-      whiteboards[whiteboardId][resourceJid].paths[path.id] = _.cloneDeep(path);
+      whiteboards[whiteboardId][path.id] = _.cloneDeep(path);
     }
 
-    whiteboards[whiteboardId][resourceJid].paths[path.id].color = color;
+    whiteboards[whiteboardId][path.id].color = color;
 
     if(this.refs[whiteboardId] &&
       this.refs[whiteboardId].processCommand && 
-      whiteboards[whiteboardId][resourceJid].paths[path.id].points.length) {
-      var lastPoint = whiteboards[whiteboardId][resourceJid].paths[path.id].points[whiteboards[whiteboardId][resourceJid].paths[path.id].points.length - 1];
+      whiteboards[whiteboardId][path.id].points.length) {
+      var lastPoint = whiteboards[whiteboardId][path.id].points[whiteboards[whiteboardId][path.id].points.length - 1];
       this.refs[whiteboardId]
           .processCommand
-          .call(this.refs[whiteboardId], 'syncPointer', resourceJid, lastPoint.x, lastPoint.y, 'pen', color);
+          .call(this.refs[whiteboardId], 'syncPointer', path.owner, lastPoint.x, lastPoint.y, 'pen', color);
     }  
     
     this.setState({whiteboards: whiteboards});
   }, 
 
-  interceptSyncText: function(whiteboardId, commandName, resourceJid, text, color) {
+  interceptSyncText: function(whiteboardId, commandName, text, color) {
     var whiteboards = this.state.whiteboards;
 
     whiteboards[whiteboardId] = whiteboards[whiteboardId] || {};
-    whiteboards[whiteboardId][resourceJid] = whiteboards[whiteboardId][resourceJid] || {};
-    whiteboards[whiteboardId][resourceJid].texts = whiteboards[whiteboardId][resourceJid].texts || {};
-    whiteboards[whiteboardId][resourceJid].texts[text.id] = {text: _.cloneDeep(text), color: color};
+    whiteboards[whiteboardId][text.id] = _.cloneDeep(text);
+    whiteboards[whiteboardId][text.id].color = color;
     this.setState({whiteboards: whiteboards});
   },
 
+  interceptRemoveObject: function(whiteboardId, commandName, id) {
+    var whiteboards = this.state.whiteboards;
+    delete whiteboards[whiteboardId][id];
+    this.setState({whiteboards: whiteboards});
+  },
+
+  generateUndoSyncText: function(whiteboardId, commandName, text, color) {
+    if(this.prevCommand[0] !== whiteboardId || this.prevCommand[1] !== commandName || this.prevCommand[2].id !== text.id) {
+      var undoManagers = this.state.undoManagers,
+          whiteboards = this.state.whiteboards;
+      
+      undoManagers[whiteboardId] = undoManagers[whiteboardId] || new UndoManager();
+
+      if(whiteboards[whiteboardId] &&
+        whiteboards[whiteboardId][text.id]) {
+        var cachedText =  _.cloneDeep(whiteboards[whiteboardId][text.id]);
+        undoManagers[whiteboardId].add(function() {
+          var args = [whiteboardId, 'syncText', cachedText, color, true];
+          this.props.sendCommand.apply(this, args);
+          this.processCommand.apply(this, args);
+        }.bind(this));
+      } 
+      else {
+        undoManagers[whiteboardId].add(function() {
+          var args = [whiteboardId, 'removeObject', text.id];
+          this.props.sendCommand.apply(this, args);
+          this.processCommand.apply(this, args);
+        }.bind(this));
+      }
+
+      this.setState({undoManagers: undoManagers});
+    }
+  },
+
+  generateUndoSyncPath: function(whiteboardId, commandName, path, color) {
+    if(this.prevCommand[0] !== whiteboardId || this.prevCommand[1] !== commandName || this.prevCommand[2].id !== path.id) {
+      var undoManagers = this.state.undoManagers;
+
+      undoManagers[whiteboardId] = undoManagers[whiteboardId] || new UndoManager();
+
+      undoManagers[whiteboardId].add(function() {
+        this.props.sendCommand(whiteboardId, 'removeObject', path.id);
+        this.processCommand(whiteboardId, 'removeObject', path.id);
+      }.bind(this));
+
+      this.setState({undoManagers: undoManagers});
+    }
+  },
+
+  generateUndoClear: function(whiteboardId, commandName) {
+    var undoManagers = this.state.undoManagers;
+
+    undoManagers[whiteboardId] = undoManagers[whiteboardId] || new UndoManager();
+
+    undoManagers[whiteboardId].add(function() {
+      this.props.sendCommand(whiteboardId, 'undoClear');
+    }.bind(this));
+
+    this.setState({undoManagers: undoManagers});    
+  },
+
   renderWhiteboard: function() {
-    var whiteboardId = 'wb_' + this.props.largeVideo.stream.id.replace('-', '_');
-    
-    return <Whiteboard
-              id={whiteboardId}
-              ref={whiteboardId}
-              dimensions={this.state.dimensions} 
-              collaborationToolsToggle={this.props.collaborationToolsToggle} 
-              sendCommand={this.sendCommand}
-              participants={this.props.participants} 
-              whiteboardData={this.state.whiteboards[whiteboardId]}
-              local={this.props.local} />;
+    if(this.state.currentWhiteboardId) {
+      return <Whiteboard
+                id={this.state.currentWhiteboardId}
+                ref={this.state.currentWhiteboardId}
+                dimensions={this.state.dimensions} 
+                collaborationToolsToggle={this.props.collaborationToolsToggle} 
+                sendCommand={this.sendCommand}
+                participants={this.props.participants} 
+                whiteboardData={this.state.whiteboards[this.state.currentWhiteboardId]}
+                local={this.props.local} />;
+    }
   },
 
   render: function() {

@@ -13,7 +13,7 @@ var config = {
     useStunTurn: true, // use XEP-0215 to fetch STUN and TURN server
     useIPv6: true, // ipv6 support. use at your own risk
     useNicks: false,
-    bosh: '/http-bind/', // FIXME: use xep-0156 for that
+    bosh: 'wss://meet.jit.si/xmpp-websocket', // FIXME: use xep-0156 for that
     etherpad_base: 'https://meet.jit.si/etherpad/p/',
     clientNode: 'http://jitsi.org/jitsimeet', // The name of client node advertised in XEP-0115 'c' stanza
     //defaultSipNumber: '', // Default SIP number

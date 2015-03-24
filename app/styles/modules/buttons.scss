@@ -67,8 +67,13 @@ $primary-button-bg: #3bafda;
 
 @each $button in $buttons-with-disabled-state-list {
   .btn-#{$button} {
-    &.disabled, &:disabled {
-      background-image: url("../images/icons/#{$button}_disabled.svg");
+    &.is-disabled, &:disabled {
+      cursor: default;
+      background-image: url("../images/icons/#{$button}_disabled.svg");    
+      
+      &:hover, &:focus, &:active {
+        background-image: url("../images/icons/#{$button}_disabled.svg");
+      }
     }
   }
 }
