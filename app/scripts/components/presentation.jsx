@@ -98,8 +98,7 @@ var Presentation = React.createClass({
   interceptSendingCommands: function() {
     return {
       syncPath: this.generateUndoSyncPath,
-      syncText: this.generateUndoSyncText,
-      clearWhiteboard: this.generateUndoClear
+      syncText: this.generateUndoSyncText
     };
   },
 
@@ -115,17 +114,20 @@ var Presentation = React.createClass({
   },
 
   cacheAndClear: function(whiteboardId, commandName) {
-    if(this.state.currentWhiteboardId && this.state.whiteboards[this.state.currentWhiteboardId]) {
+    if(this.state.whiteboards[whiteboardId]) {
+      var whiteboards = this.state.whiteboards,
+          whiteboardsCache = this.state.whiteboardsCache;
 
-        var whiteboards = this.state.whiteboards,
-            whiteboardsCache = this.state.whiteboardsCache;
+      whiteboardsCache[whiteboardId] = whiteboardsCache[whiteboardId] || [];
+      whiteboardsCache[whiteboardId].push(this.state.whiteboards[whiteboardId]);
+      this.state.whiteboards[whiteboardId] = {};
+      this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
+      
+      if(this.refs[whiteboardId]) {
+        this.refs[whiteboardId].renderFromData();
+      }
 
-        whiteboardsCache[this.state.currentWhiteboardId] = whiteboardsCache[this.state.currentWhiteboardId] || [];
-        whiteboardsCache[this.state.currentWhiteboardId].push(this.state.whiteboards[this.state.currentWhiteboardId]);
-        this.state.whiteboards[this.state.currentWhiteboardId] = {};
-        this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
-
-        this.refs[this.state.currentWhiteboardId].renderFromData();
+      this.generateUndoClear(whiteboardId, commandName);
     }
   },
 
@@ -135,9 +137,12 @@ var Presentation = React.createClass({
 
     whiteboardsCache = this.state.whiteboardsCache;
     whiteboardsCache[whiteboardId] = whiteboardsCache[whiteboardId] || [];
-    whiteboards[this.state.currentWhiteboardId] = _.assign(whiteboards[this.state.currentWhiteboardId], whiteboardsCache[whiteboardId].pop());
+    whiteboards[whiteboardId] = _.assign(whiteboards[whiteboardId], whiteboardsCache[whiteboardId].pop());
     this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
-    this.refs[this.state.currentWhiteboardId].renderFromData();
+    
+    if(this.refs[whiteboardId]) {
+        this.refs[whiteboardId].renderFromData();
+    }
   },
 
   processCommand: function() {
