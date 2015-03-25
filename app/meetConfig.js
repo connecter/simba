@@ -17,7 +17,7 @@ var config = {
     //focusUserJid: 'focus@auth.connecter.io', // The real JID of focus participant - can be overridden here
     //defaultSipNumber: '', // Default SIP number
     desktopSharing: 'ext', // Desktop sharing method. Can be set to 'ext', 'webrtc' or false to disable.
-    chromeExtensionId: 'jjciemdpijjajiehmfknimmaahgpkpej', // Id of desktop streamer Chrome extension
+    chromeExtensionId: 'emajncjbjhegkhcionbbnjhbfcnaclbj', // Id of desktop streamer Chrome extension
     desktopSharingSources: ['screen', 'window'],
     minChromeExtVersion: '0.1', // Required version of Chrome extension
     enableRtpStats: false, // Enables RTP stats processing
