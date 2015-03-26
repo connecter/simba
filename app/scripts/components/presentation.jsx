@@ -109,6 +109,79 @@ var Presentation = React.createClass({
     }
   },
 
+  snapshot: function() {
+    var markup, video, snapshotCanvas, drawContext, dimensions, videoScale, a, width, height, dWidth;
+
+    if(this.props.largeVideo) {
+      video = this.refs.largeVideoContainer.refs.largeVideo.getDOMNode();
+      
+      if(this.state.currentWhiteboardId && this.state.whiteboards[this.state.currentWhiteboardId]) {
+        markup = this.refs[this.state.currentWhiteboardId].refs.canvas.getDOMNode();
+      }
+
+      snapshotCanvas = document.createElement('canvas');
+      drawContext = snapshotCanvas.getContext('2d');
+      
+      dimensions = this.state.dimensions;
+
+      if(video) {
+        videoScale = {
+          width: dimensions.width / video.videoWidth,
+          height: dimensions.height / video.videoHeight
+        };
+
+        width = dWidth = dimensions.width + dimensions.left + dimensions.right;
+        height = dimensions.height + dimensions.top + dimensions.bottom - 60;
+
+        snapshotCanvas.width = width;
+        snapshotCanvas.height = height;
+
+        if(this.props.shouldFlipVideo) {
+          drawContext.save();
+          drawContext.scale(-1, 1);
+          dWidth = dWidth * -1;
+        }
+
+        drawContext.drawImage(video,
+          -dimensions.left / videoScale.width,
+          -dimensions.top / videoScale.height,
+          width / videoScale.width,
+          height / videoScale.height,
+          0,
+          0,
+          dWidth,
+          height
+        );
+      }
+
+
+      if(this.props.shouldFlipVideo) {
+        drawContext.restore();
+        dWidth = dWidth * -1;
+      }
+
+      if(markup) {
+        drawContext.drawImage(markup,
+          -dimensions.left,
+          -dimensions.top,
+          width,
+          height,
+          0,
+          0,
+          dWidth,
+          height
+        );
+      }
+
+      var now = new Date();
+
+      a = document.createElement('a');
+      a.download = "Connecter.io " + now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+      a.href = snapshotCanvas.toDataURL();
+      a.click();
+    }
+  },
+
   clear: function() {
     this.sendCommand(this.state.currentWhiteboardId, 'clearWhiteboard');
   },
@@ -290,7 +363,8 @@ var Presentation = React.createClass({
                       isScreen={this.props.isScreen}
                       getPresentationSpaceDOMNode={this.getPresentationSpaceDOMNode}
                       setDimensions={this.setDimensions}
-                      shouldFlipVideo={this.props.shouldFlipVideo} />
+                      shouldFlipVideo={this.props.shouldFlipVideo}
+                      ref="largeVideoContainer" />
         </section>
       ); 
     }

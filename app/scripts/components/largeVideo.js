@@ -126,11 +126,11 @@ var LargeVideo = React.createClass({
     var isScreen = this.props.largeVideo.videoType === 'screen' || this.props.isScreen;
     var videoSpaceHeight = isScreen ? $(this.props.getPresentationSpaceDOMNode()).outerHeight() : window.innerHeight;
     var videoSize = this[isScreen ? 'getDesktopVideoSize': 'getCameraVideoSize'](videoWidth, videoHeight, videoSpaceWidth, videoSpaceHeight);
-    var largeVideoWidth = videoSize[0];
-    var largeVideoHeight = videoSize[1];
+    var largeVideoWidth = Math.floor(videoSize[0]);
+    var largeVideoHeight = Math.floor(videoSize[1]);
     var videoPosition = this[isScreen ? 'getDesktopVideoPosition': 'getCameraVideoPosition'](largeVideoWidth, largeVideoHeight, videoSpaceWidth, videoSpaceHeight);
-    var horizontalIndent = videoPosition[0];
-    var verticalIndent = videoPosition[1];
+    var horizontalIndent = Math.floor(videoPosition[0]);
+    var verticalIndent = Math.floor(videoPosition[1]);
 
     this.positionVideo($(this.refs.largeVideo.getDOMNode()), largeVideoWidth, largeVideoHeight, horizontalIndent, verticalIndent);
     this.props.setDimensions({

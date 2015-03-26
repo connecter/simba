@@ -150,6 +150,10 @@ var Container = React.createClass({
     }
   },
 
+  snapshot: function() {
+    this.refs.presentation.snapshot();
+  },
+
   setHasUndo: function(hasUndo) {
     this.setState({hasUndo: hasUndo});
   },
@@ -360,7 +364,7 @@ var Container = React.createClass({
   },
 
   renderPresentation: function() {
-    return <Presentation ref="presentation"largeVideo={this.state.largeVideo.stream}
+    return <Presentation ref="presentation" largeVideo={this.state.largeVideo.stream}
                          isScreen={this.state.largeVideo.isScreen}
                          local={this.state.local}
                          shouldFlipVideo={this.shouldFlipVideo()}

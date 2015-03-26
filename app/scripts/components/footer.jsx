@@ -113,7 +113,7 @@ var Footer = React.createClass({
             <li><button className={"btn-icon btn-text " + textButtonClasses} title={textButtonText} onClick={this.props.execCommand("toggleText")}><span className="sr-only">{textButtonText}</span></button></li>
             <li><button className={"btn-icon btn-undo " + undoButtonClasses} title="Undo" onClick={this.props.execCommand("undo")}><span className="sr-only">Undo</span></button></li>
             <li><button className={"btn-icon btn-clear " + clearButtonClasses} title="Clear" onClick={this.props.execCommand("clear")}><span className="sr-only">Clear</span></button></li>
-            <li><button className="btn-icon btn-snapshot" title="Take a snapshot"><span className="sr-only">Take a snapshot</span></button></li>
+            <li><button className="btn-icon btn-snapshot" title="Take a snapshot" onClick={this.props.execCommand("snapshot")}><span className="sr-only">Take a snapshot</span></button></li>
           </ul>
           <button className={"btn-icon pull-left " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>
           <div className={"pull-left " + toggleVerticalSeperatorClasses}></div>
