@@ -5,7 +5,8 @@ var React = require('react/addons'),
 
 var  LargeVideo = require('./largeVideo'),
     Whiteboard = require('./whiteboard'),
-    UndoManager = require('../modules/UndoManager');
+    UndoManager = require('../modules/UndoManager'),
+    Queue = require('../modules/Queue');
 
 var Presentation = React.createClass({
   propTypes: {
@@ -87,18 +88,21 @@ var Presentation = React.createClass({
 
   interceptReceivingCommands: function() {
     return {
-      syncPath: this.interceptSyncPath,
-      syncText: this.interceptSyncText,
-      removeObject: this.interceptRemoveObject,
-      clearWhiteboard: this.cacheAndClear,
-      undoClear: this.restoreFromCache
+      syncPath: [this.interceptSyncPath, this.invokeSyncPointerUsingSyncPathArgs],
+      syncText: [this.interceptSyncText],
+      removeObject: [this.interceptRemoveObject],
+      clearWhiteboard: [this.cacheAndClear],
+      undoClear: [this.restoreFromCache, this.removeLastClearUndo]
     };
   },
 
   interceptSendingCommands: function() {
     return {
-      syncPath: this.generateUndoSyncPath,
-      syncText: this.generateUndoSyncText
+      syncPath: [this.interceptSyncPath, this.generateUndoSyncPath],
+      syncText: [this.interceptSyncText, this.generateUndoSyncText],
+      clearWhiteboard: [this.cacheAndClear],
+      removeObject: [this.interceptRemoveObject],
+      undoClear: [this.restoreFromCache]
     };
   },
 
@@ -197,7 +201,9 @@ var Presentation = React.createClass({
       this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
       
       if(this.refs[whiteboardId]) {
-        this.refs[whiteboardId].renderFromData();
+        window.setTimeout(function(){
+          this.refs[whiteboardId].renderFromData();
+        }.bind(this), 0);
       }
 
       this.generateUndoClear(whiteboardId, commandName);
@@ -214,13 +220,29 @@ var Presentation = React.createClass({
     this.setState({whiteboards: whiteboards, whiteboardsCache: whiteboardsCache});
     
     if(this.refs[whiteboardId]) {
+      window.setTimeout(function() {
         this.refs[whiteboardId].renderFromData();
+      }.bind(this), 0);
     }
   },
 
+  removeLastClearUndo: function(whiteboardId, commandName) {
+    var undoManagers = this.state.undoManagers;
+
+    if(undoManagers[whiteboardId]) {
+      undoManagers[whiteboardId].removeLastOfType('clear');
+    }
+
+    this.setState({undoManagers: undoManagers});
+  },
+
   processCommand: function() {
+    var args = arguments;
+
     if(this.interceptReceivingCommands()[arguments[1]]) {
-      this.interceptReceivingCommands()[arguments[1]].apply(this, arguments);
+      _.forEach(this.interceptReceivingCommands()[arguments[1]], function(interceptor) {
+        interceptor.apply(this, args);
+      }.bind(this));
     }
 
     if(this.refs[arguments[0]] && this.refs[arguments[0]].processCommand) {
@@ -231,8 +253,12 @@ var Presentation = React.createClass({
   },
 
   sendCommand: function() {
+    var args = arguments;
+
     if(this.interceptSendingCommands()[arguments[1]]) {
-      this.interceptSendingCommands()[arguments[1]].apply(this, arguments);
+      _.forEach(this.interceptSendingCommands()[arguments[1]], function(interceptor) {
+        interceptor.apply(this, args);
+      }.bind(this));
     }
     
     this.prevCommand = arguments;
@@ -258,6 +284,12 @@ var Presentation = React.createClass({
 
     whiteboards[whiteboardId][path.id].color = color;
 
+    this.setState({whiteboards: whiteboards});
+  },
+
+  invokeSyncPointerUsingSyncPathArgs: function(whiteboardId, commandName, path, color) {
+    var whiteboards = this.state.whiteboards;
+
     if(this.refs[whiteboardId] &&
       this.refs[whiteboardId].processCommand && 
       whiteboards[whiteboardId][path.id].points.length) {
@@ -265,10 +297,8 @@ var Presentation = React.createClass({
       this.refs[whiteboardId]
           .processCommand
           .call(this.refs[whiteboardId], 'syncPointer', path.owner, lastPoint.x, lastPoint.y, 'pen', color);
-    }  
-    
-    this.setState({whiteboards: whiteboards});
-  }, 
+    }
+  },
 
   interceptSyncText: function(whiteboardId, commandName, text, color) {
     var whiteboards = this.state.whiteboards;
@@ -334,8 +364,8 @@ var Presentation = React.createClass({
     undoManagers[whiteboardId] = undoManagers[whiteboardId] || new UndoManager();
 
     undoManagers[whiteboardId].add(function() {
-      this.props.sendCommand(whiteboardId, 'undoClear');
-    }.bind(this));
+      this.sendCommand(whiteboardId, 'undoClear');
+    }.bind(this), 'clear');
 
     this.setState({undoManagers: undoManagers});    
   },

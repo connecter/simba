@@ -17,6 +17,8 @@ Queue.prototype.add = function(func) {
   if(!this.isRunning) {
     this.next();
   }
+
+  return this;
 };
 
 Queue.prototype.next = function() {

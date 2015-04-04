@@ -130,10 +130,10 @@ var whiteboard = React.createClass({
       _.forEach(this.props.whiteboardData, function(obj) {
         switch(obj.type) {
           case 'path':
-            this.syncPath(obj, obj.color, true);
+            this.syncPath(obj, obj.color);
             break;
           case 'text':
-            this.syncText(obj, obj.color, true);
+            this.syncText(obj, obj.color);
             break;
         }
       }, this);
@@ -141,20 +141,18 @@ var whiteboard = React.createClass({
   },
 
   syncPointer: function(resourceJid, x, y, type, color) {
-    if(resourceJid !== APP.xmpp.myResource()) {
-      var newParticipant = {};
+    var newParticipant = {};
 
-      newParticipant['participant_' + resourceJid] = {
-        resourceJid: resourceJid,
-        x: x * this.props.dimensions.width,
-        y: y * this.props.dimensions.height,
-        displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone',
-        type: type,
-        color: color
-      };
+    newParticipant['participant_' + resourceJid] = {
+      resourceJid: resourceJid,
+      x: x * this.props.dimensions.width,
+      y: y * this.props.dimensions.height,
+      displayName: this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone',
+      type: type,
+      color: color
+    };
 
-      this.setState({pariticipantsWithPointers: _.assign(this.state.pariticipantsWithPointers, newParticipant)});
-    }
+    this.setState({pariticipantsWithPointers: _.assign(this.state.pariticipantsWithPointers, newParticipant)});
   },
 
   deletePointer: function(resourceJid) {
@@ -162,86 +160,82 @@ var whiteboard = React.createClass({
       'participant_' + resourceJid)});
   },
 
-  syncPath: function(path, color, renderLocal) {
-    if(path.owner !== APP.xmpp.myResource() || renderLocal) {
-      var points = canvasUtils.scalePathPointsToCurrent(path.points, this.props.dimensions),
-          boundingBox,
-          originLeft,
-          originTop,
-          currentPath,
-          newPath;
+  syncPath: function(path, color) {
+    var points = canvasUtils.scalePathPointsToCurrent(path.points, this.props.dimensions),
+        boundingBox,
+        originLeft,
+        originTop,
+        currentPath,
+        newPath;
 
-      currentPath = _.find(this.canvas.getObjects(), {id: path.id});
+    currentPath = _.find(this.canvas.getObjects(), {id: path.id});
 
-      if(currentPath) {
-        points = currentPath.pathPoints.concat(points);
-        this.canvas.remove(currentPath);
-      }
-
-      boundingBox = canvasUtils.getPathBoundingBox(points);
-      originLeft = boundingBox.minx  + (boundingBox.maxx - boundingBox.minx) / 2;
-      originTop = boundingBox.miny  + (boundingBox.maxy - boundingBox.miny) / 2;
-
-      newPath = new fabric.Path(canvasUtils.convertPointsToSVGPath(
-          points, boundingBox.minx, boundingBox.miny).join(''), { 
-           id: path.id,
-           stroke: color,
-           strokeWidth: 5,
-           fill: null,
-           strokeLineCap: 'round',
-           strokeLineJoin: 'round',
-           pathPoints: points,
-         });
-      
-      this.canvas.add(newPath);
-
-      newPath.set({
-        left: originLeft,
-        top: originTop
-      });
-
-      this.canvas.renderAll();
+    if(currentPath) {
+      points = currentPath.pathPoints.concat(points);
+      this.canvas.remove(currentPath);
     }
+
+    boundingBox = canvasUtils.getPathBoundingBox(points);
+    originLeft = boundingBox.minx  + (boundingBox.maxx - boundingBox.minx) / 2;
+    originTop = boundingBox.miny  + (boundingBox.maxy - boundingBox.miny) / 2;
+
+    newPath = new fabric.Path(canvasUtils.convertPointsToSVGPath(
+        points, boundingBox.minx, boundingBox.miny).join(''), { 
+         id: path.id,
+         stroke: color,
+         strokeWidth: 5,
+         fill: null,
+         strokeLineCap: 'round',
+         strokeLineJoin: 'round',
+         pathPoints: points,
+       });
+    
+    this.canvas.add(newPath);
+
+    newPath.set({
+      left: originLeft,
+      top: originTop
+    });
+
+    this.canvas.renderAll();
   },
 
 
-  syncText: function(text, color, renderLocal) {
+  syncText: function(text, color) {
     var textObj, 
-        TextType;
+      TextType;
 
-    if(text.owner !== APP.xmpp.myResource() || renderLocal) {
-      textObj = _.find(this.canvas.getObjects(), {id: text.id});
-      TextType = text.owner === APP.xmpp.myResource() ? fabric.IText : fabric.Text;
+    textObj = _.find(this.canvas.getObjects(), {id: text.id});
+    TextType = text.owner === APP.xmpp.myResource() ? fabric.IText : fabric.Text;
+    
+    if(!textObj) {
+      textObj = new TextType('', {id: text.id});
+      this.canvas.add(textObj);
+    }
+
+    textObj.set({
+      top: text.top * this.props.dimensions.height,
+      left: text.left * this.props.dimensions.width,
+      text: text.text,
+      fill: color,
+      fontSize: 20,
+      fontFamily: 'Titillium Web'
+    });
+
+    this.canvas.renderAll();
+
+    if(TextType === fabric.IText) {
+      textObj.set({cursorColor: color});
+      this.bindITextChanged(textObj);
       
-      if(!textObj) {
-        textObj = new TextType('', {id: text.id});
-        this.canvas.add(textObj);
-      }
-
-      textObj.set({
-        top: text.top * this.props.dimensions.height,
-        left: text.left * this.props.dimensions.width,
-        text: text.text,
-        fill: color,
-        fontSize: 20,
-        fontFamily: 'Titillium Web'
-      });
-
-      this.canvas.renderAll();
-
-      if(TextType === fabric.IText) {
-        textObj.set({cursorColor: color});
-        this.bindITextChanged(textObj);
+      if(this.props.collaborationToolsToggle === 'text') {
+        textObj.editable = true;
         
-        if(this.props.collaborationToolsToggle === 'text') {
-          textObj.editable = true;
-          
-          if(renderLocal) {
-            _.forEach(fabric.IText.instances, function(obj) {
-              obj.exitEditing();
-              obj.editable = true;
-            });
-          }
+        if(text.owner === APP.xmpp.myResource() ? fabric.IText : fabric.Text) {
+          _.forEach(fabric.IText.instances, function(obj) {
+            obj.exitEditing();
+            obj.editable = true;
+          });
         }
       }
     }

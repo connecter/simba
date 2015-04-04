@@ -10,7 +10,7 @@ var APP = {
   init: function () {
     this.UI = require("./modules/UI");
     this.connectionquality = require("../meet/modules/connectionquality/connectionquality");
-        this.statistics = require("../meet/modules/statistics/statistics");
+    this.statistics = require("../meet/modules/statistics/statistics");
     this.RTC = require("../meet/modules/RTC/RTC");
     this.simulcast = require("../meet/modules/simulcast/simulcast");
     this.xmpp = require("../meet/modules/xmpp/xmpp");

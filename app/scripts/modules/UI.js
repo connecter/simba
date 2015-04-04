@@ -121,7 +121,9 @@ function audioLevelHandler(jid, audioLevel) {
 }
 
 function processCommandReceivedThroughChat(from, display, command) {
-  View.processCommand(JSON.parse(command));
+  if(Strophe.getResourceFromJid(from)!==APP.xmpp.myResource()) {
+    View.processCommand(JSON.parse(command));
+  }
 }
 
 UI.start = function() {
