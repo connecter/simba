@@ -38,6 +38,8 @@ function registerListeners() {
 
   APP.xmpp.addListener(XMPPEvents.MESSAGE_RECEIVED, processCommandReceivedThroughChat);
 
+  APP.RTC.addStreamListener(onVideoTypeChanged, StreamEventTypes.EVENT_TYPE_REMOTE_CHANGED);
+
   APP.RTC.addListener(RTCEvents.LASTN_CHANGED, function (lastNEndpoints, endpointsEnteringLastN, stream) {
     console.log("LASTN_CHANGED");
     console.log(arguments);
@@ -79,6 +81,10 @@ function streamHandler(stream) {
 
 function remoteStreamHandler(stream) {
   View.addStream(stream);
+}
+
+function onVideoTypeChanged(jid) {
+  View.changeVideoType(jid);
 }
 
 function onDominantSpeakerChanged(resourceJid) {
@@ -131,6 +137,10 @@ UI.start = function() {
   View = React.render(React.createElement(Container), $('.connecter-wrap')[0]);
   registerListeners();
   NicknameHandler.init(eventEmitter);
+};
+
+UI.setVideoMuteButtonsState = function(mute) {
+  View.setVideoMuteButtonsState(mute);
 };
 
 UI.addListener = function (type, listener) {

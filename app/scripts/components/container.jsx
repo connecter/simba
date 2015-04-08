@@ -96,15 +96,16 @@ var Container = React.createClass({
   },
 
   toggleVideo: function() {
-    var that = this;
+    APP.RTC.setVideoMute(!APP.RTC.localVideo.isMuted(),
+      this.setVideoMuteButtonsState);
+  },
 
-    APP.xmpp.setVideoMute(!this.state.callControlToggles.videoMute, function() {
-      var newLocal = that.state.local;
-    
-      newLocal.videoMute = !that.state.callControlToggles.videoMute;
-      that.setState({callControlToggles: _.assign(that.state.callControlToggles,
-        {videoMute: !that.state.callControlToggles.videoMute}), local:newLocal});
-    });
+  setVideoMuteButtonsState: function(mute) {
+    var newLocal = this.state.local;
+
+    newLocal.videoMute = mute;
+    this.setState({callControlToggles: _.assign(this.state.callControlToggles,
+      {videoMute: mute}), local: newLocal});
   },
 
   toggleAudio: function() {
@@ -173,44 +174,26 @@ var Container = React.createClass({
   addStream: function (stream) {
     if (stream.peerjid) {
       var participantId = 'participant_' + Strophe.getResourceFromJid(stream.peerjid),
-          participant = {}, 
-          that = this,
-          newState = {},
-          findVideoType = function() {
-            window.setTimeout(function() {
-              if(stream.videoType) {
-                participant[participantId].isScreen = stream.videoType==='screen';
-                
-                if(that.isParticipantActive(stream.peerjid)) {
-                  newState.largeVideo = that.changeLargeVideoTo(that.state.participants[participantId], true);
-                }
-
-                newState.participants = _.assign(that.state.participants, participant);
-                that.setState(newState);
-              } else {
-                findVideoType();
-              }
-            }, 0);
-          };
+          participant = {},
+          newState = {};
 
       participant[participantId] = this.state.participants[participantId] || {};
       
+
       if(stream.type==="Video") {
         participant[participantId].video = stream;        
-        participant[participantId].isScreen = stream.videoType==='screen';
-        
-        if(that.isParticipantActive(stream.peerjid)) {
-          newState.largeVideo = that.changeLargeVideoTo(that.state.participants[participantId], true);
+
+        if(this.state.largeVideo.userJid === stream.peerjid) {
+          newState.largeVideo = this.changeLargeVideoTo(this.state.participants[participantId], true);
         }
 
-        newState.participants = _.assign(that.state.participants, participant);
-        that.setState(newState);
-        findVideoType();
+        newState.participants = _.assign(this.state.participants, participant);
+        this.setState(newState);
       } 
 
       if(stream.type==="Audio") {
         participant[participantId].audio = stream;
-        this.setState({participants: _.assign(that.state.participants, participant)});
+        this.setState({participants: _.assign(this.state.participants, participant)});
       }
 
 
@@ -222,6 +205,17 @@ var Container = React.createClass({
         console.error('can not associate stream', id, 'with a participant');
         return;
       }
+    }
+  },
+
+  changeVideoType: function(jid) {
+    if(jid) {
+      var participantId = 'participant_' + Strophe.getResourceFromJid(jid),
+          participants = this.state.participants;
+
+      participants[participantId].isScreen = APP.RTC.isVideoSrcDesktop(jid);
+
+      this.setState({participants: participants});
     }
   },
 
