@@ -344,8 +344,7 @@ var Container = React.createClass({
     if (jid === 'local') {
       return this.state.largeVideo.userJid === jid && _.keys(this.state.participants).length > 0;
     } else {
-      return this.state.dominantSpeaker === 'participant_' + Strophe.getResourceFromJid(jid) && 
-            (this.state.pinnedParticipant === jid || !this.state.pinnedParticipant);
+        return this.state.largeVideo.userJid === jid;
     }
   },
 
