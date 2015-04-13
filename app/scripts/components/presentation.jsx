@@ -5,8 +5,8 @@ var React = require('react/addons'),
 
 var  LargeVideo = require('./largeVideo'),
     Whiteboard = require('./whiteboard'),
-    UndoManager = require('../modules/UndoManager'),
-    Queue = require('../modules/Queue');
+    Toastr = require('./toastr'),
+    UndoManager = require('../modules/UndoManager');
 
 var Presentation = React.createClass({
   propTypes: {
@@ -183,17 +183,19 @@ var Presentation = React.createClass({
       a.download = "Connecter.io " + now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
       a.href = snapshotCanvas.toDataURL();
       a.click();
+      this.refs.toastr.addNotification('A snapshot is being downloaded...');
     }
   },
 
   clear: function() {
-    this.sendCommand(this.state.currentWhiteboardId, 'clearWhiteboard');
+    this.sendCommand(this.state.currentWhiteboardId, 'clearWhiteboard', APP.xmpp.myResource());
   },
 
-  cacheAndClear: function(whiteboardId, commandName) {
+  cacheAndClear: function(whiteboardId, commandName, resourceJid) {
     if(this.state.whiteboards[whiteboardId]) {
       var whiteboards = this.state.whiteboards,
-          whiteboardsCache = this.state.whiteboardsCache;
+          whiteboardsCache = this.state.whiteboardsCache,
+          username;
 
       whiteboardsCache[whiteboardId] = whiteboardsCache[whiteboardId] || [];
       whiteboardsCache[whiteboardId].push(this.state.whiteboards[whiteboardId]);
@@ -207,6 +209,14 @@ var Presentation = React.createClass({
       }
 
       this.generateUndoClear(whiteboardId, commandName);
+
+      if(resourceJid !== APP.xmpp.myResource()) {
+        username = this.props.participants['participant_' + resourceJid].displayName ? this.props.participants['participant_' + resourceJid].displayName : 'Someone';
+      } else {
+        username = 'You';
+      }
+      
+      this.refs.toastr.addNotification(username + ' cleared all markups');
     }
   },
 
@@ -389,6 +399,7 @@ var Presentation = React.createClass({
       return (
         <section className="presentation row" ref="presentationSpace">
           {this.renderWhiteboard()}
+          <Toastr ref='toastr' />
           <LargeVideo largeVideo={this.props.largeVideo}
                       isScreen={this.props.isScreen}
                       getPresentationSpaceDOMNode={this.getPresentationSpaceDOMNode}
