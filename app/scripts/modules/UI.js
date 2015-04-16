@@ -24,13 +24,13 @@ function registerListeners() {
 
   APP.RTC.addStreamListener(remoteStreamHandler, StreamEventTypes.EVENT_TYPE_REMOTE_CREATED);
 
-  APP.xmpp.addListener(XMPPEvents.CHANGED_STREAMS, onChangedStreams);
+  APP.xmpp.addListener(XMPPEvents.STREAMS_CHANGED, onChangedStreams);
 
   APP.xmpp.addListener(XMPPEvents.MUC_JOINED, onMucJoined);
 
-  APP.xmpp.addListener(XMPPEvents.MUC_ENTER, onMucEntered);
+  APP.xmpp.addListener(XMPPEvents.MUC_MEMBER_JOINED, onMucEntered);
 
-  APP.xmpp.addListener(XMPPEvents.MUC_LEFT, onMucLeft);
+  APP.xmpp.addListener(XMPPEvents.MUC_MEMBER_LEFT, onMucLeft);
   
   APP.UI.addListener(UIEvents.NICKNAME_CHANGED, onNicknameChanged);
 
