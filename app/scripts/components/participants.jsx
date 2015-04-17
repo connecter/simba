@@ -45,9 +45,14 @@ var Participants = React.createClass({
      var classes = cx({
       'is-collapsed': this.state.collapsed,
     });
+
+    var buttonClasses = cx({
+      'is-toggled': !this.state.collapsed,
+    });
     return (
       <section className={"participants col " + classes}>
         <div className="toggle">
+          <button className={"btn-icon btn-participant pull-right " + buttonClasses} title="Chat" onClick={this.handleToggle}><span className="sr-only">Participants</span></button>
           <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         <div className="participant">

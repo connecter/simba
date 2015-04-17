@@ -1,6 +1,6 @@
-$buttons-list: "add", "arrow-left", "arrow-right", "arrow-small-left", "arrow-small-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "screenshare", "settings", "snapshot", "text", "undo";
+$buttons-list: "add", "arrow-left", "arrow-right", "arrow-small-left", "arrow-small-right", "attach", "camera", "chat", "clear", "cursor", "end-call", "lock", "meeting_join", "meeting_locked", "meeting_start", "mic", "notes", "pen", "participant", "screenshare", "settings", "snapshot", "text", "undo";
 
-$buttons-with-toggled-state-list: "add", "attach", "chat", "cursor", "end-call", "lock", "mic", "notes", "pen", "screenshare", "text", "camera";
+$buttons-with-toggled-state-list: "add", "attach", "chat", "cursor", "end-call", "lock", "mic", "notes", "pen", "participant", "screenshare", "text", "camera";
 
 $buttons-with-disabled-state-list: "clear", "undo";
 

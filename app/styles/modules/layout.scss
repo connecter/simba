@@ -81,9 +81,15 @@ footer {
 .participants {
   left: 0;
   width: $leftbar-width;
-  
+
   &.is-collapsed {
+    transition: none;
     left: -#{$leftbar-width};
+
+    .toggle {
+      position: fixed;
+      left: -40px;
+    }
   }
 
   .bg {
