@@ -40,6 +40,11 @@ var Discussions = React.createClass({
           'is-toggled': this.state.currentOpened === "chat"
         }),
 
+        buttonsTabIndex = cx({
+          '0': !this.state.collapsed,
+          '-1': this.state.collapsed,
+        }),
+
         notesButtonClasses = cx({
           'is-toggled': this.state.currentOpened === "notes"
         });
@@ -48,8 +53,8 @@ var Discussions = React.createClass({
       <section className={"discussions col " + containerClasses}>
         <div className="toggle">
           <button className={"btn-icon btn-chat " + chatButtonClasses} title="Chat" onClick={this.openChat}><span className="sr-only">Chat</span></button>
-          <button className={"btn-icon btn-notes " + notesButtonClasses} title="Notes" onClick={this.openNotes}><span className="sr-only">Notes</span></button>
-          <button className="btn-icon btn-arrow-right pull-right" title="Close" onClick={this.closeToggle}><span className="sr-only">Close</span></button>
+          <button tabIndex={buttonsTabIndex} className={"btn-icon btn-notes " + notesButtonClasses} title="Notes" onClick={this.openNotes}><span className="sr-only">Notes</span></button>
+          <button tabIndex={buttonsTabIndex} className="btn-icon btn-arrow-right pull-right" title="Close" onClick={this.closeToggle}><span className="sr-only">Close</span></button>
           <div className="clearfix"></div>
         </div>
         {this.renderTool()}

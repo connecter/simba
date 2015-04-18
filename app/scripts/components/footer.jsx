@@ -33,7 +33,12 @@ var Footer = React.createClass({
       pointerButtonText = cx({
         'Show my cursor to participants': this.props.collaborationToolsToggle !== 'pointer',
         'Stop showing my cursor to participants': this.props.collaborationToolsToggle === 'pointer'
-      }),      
+      }), 
+
+      collaborationToolsTabIndex = cx({
+        '0': this.state.isToolbarExpanded,
+        '-1': !this.state.isToolbarExpanded,
+      }),    
 
       penButtonClasses = cx({
         'is-toggled': this.props.collaborationToolsToggle === 'pen'
@@ -107,13 +112,20 @@ var Footer = React.createClass({
         <footer className="row">
           <ul className={"toolbar btn-group pull-left " + toolbarClasses}>
             <li><button className={"btn-icon btn-screenshare " + screenshareButtonClasses} onClick={this.props.execCommand("toggleScreenshare")} title={screenshareText}><span className="sr-only">{screenshareText}</span></button></li>
+
             <li><div className="vertical-seperator"></div></li>
+
             <li><button className={"btn-icon btn-cursor " + pointerButtonClasses} title={pointerButtonText} onClick={this.props.execCommand("togglePointer")}><span className="sr-only">{pointerButtonText}</span></button></li>
-            <li><button className={"btn-icon btn-pen " + penButtonClasses} title={penButtonText} onClick={this.props.execCommand("togglePen")}><span className="sr-only">{penButtonText}</span></button></li>
-            <li><button className={"btn-icon btn-text " + textButtonClasses} title={textButtonText} onClick={this.props.execCommand("toggleText")}><span className="sr-only">{textButtonText}</span></button></li>
-            <li><button className={"btn-icon btn-undo " + undoButtonClasses} title="Undo" onClick={this.props.execCommand("undo")}><span className="sr-only">Undo</span></button></li>
-            <li><button className={"btn-icon btn-clear " + clearButtonClasses} title="Clear" onClick={this.props.execCommand("clear")}><span className="sr-only">Clear</span></button></li>
-            <li><button className="btn-icon btn-snapshot" title="Take a snapshot" onClick={this.props.execCommand("snapshot")}><span className="sr-only">Take a snapshot</span></button></li>
+
+            <li><button tabIndex={collaborationToolsTabIndex} className={"btn-icon btn-pen " + penButtonClasses} title={penButtonText} onClick={this.props.execCommand("togglePen")}><span className="sr-only">{penButtonText}</span></button></li>
+
+            <li><button tabIndex={collaborationToolsTabIndex} className={"btn-icon btn-text " + textButtonClasses} title={textButtonText} onClick={this.props.execCommand("toggleText")}><span className="sr-only">{textButtonText}</span></button></li>
+
+            <li><button tabIndex={collaborationToolsTabIndex} className={"btn-icon btn-undo " + undoButtonClasses} title="Undo" onClick={this.props.execCommand("undo")}><span className="sr-only">Undo</span></button></li>
+
+            <li><button tabIndex={collaborationToolsTabIndex} className={"btn-icon btn-clear " + clearButtonClasses} title="Clear" onClick={this.props.execCommand("clear")}><span className="sr-only">Clear</span></button></li>
+
+            <li><button tabIndex={collaborationToolsTabIndex} className="btn-icon btn-snapshot" title="Take a snapshot" onClick={this.props.execCommand("snapshot")}><span className="sr-only">Take a snapshot</span></button></li>
           </ul>
           <button className={"btn-icon pull-left " +  toggleButtonClasses} title={toggleButtonText} onClick={this.toggleToolbar}><span className="sr-only">{toggleButtonText}</span></button>
           <div className={"pull-left " + toggleVerticalSeperatorClasses}></div>

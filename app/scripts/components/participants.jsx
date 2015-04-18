@@ -41,19 +41,26 @@ var Participants = React.createClass({
   },
 
   render: function() {
-    var cx = React.addons.classSet;
-     var classes = cx({
-      'is-collapsed': this.state.collapsed,
-    });
+    var cx = React.addons.classSet,
+        
+        classes = cx({
+          'is-collapsed': this.state.collapsed,
+        }),
 
-    var buttonClasses = cx({
-      'is-toggled': !this.state.collapsed,
-    });
+        buttonClasses = cx({
+          'is-toggled': !this.state.collapsed,
+        }),
+
+        buttonsTabIndex = cx({
+          '0': !this.state.collapsed,
+          '-1': this.state.collapsed,
+        });
+
     return (
       <section className={"participants col " + classes}>
         <div className="toggle">
           <button className={"btn-icon btn-participant pull-right " + buttonClasses} title="Chat" onClick={this.handleToggle}><span className="sr-only">Participants</span></button>
-          <button className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
+          <button tabIndex={buttonsTabIndex} className={"btn-icon btn-arrow-left " + classes} title="Close" onClick={this.handleToggle}><span className="sr-only">Close</span></button>
         </div>
         <div className="participant">
           <Participant 
