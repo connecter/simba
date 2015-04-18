@@ -133,10 +133,12 @@ function processCommandReceivedThroughChat(from, display, command) {
 }
 
 UI.start = function() {
-  var Container = require('../components/container');
+  var Container = require('../components/container'),
+      shortcuts = require('./shortcuts');
   View = React.render(React.createElement(Container), $('.connecter-wrap')[0]);
   registerListeners();
   NicknameHandler.init(eventEmitter);
+  shortcuts.start(View);
 };
 
 UI.setVideoMuteButtonsState = function(mute) {
