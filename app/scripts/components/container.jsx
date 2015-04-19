@@ -195,9 +195,6 @@ var Container = React.createClass({
         participant[participantId].audio = stream;
         this.setState({participants: _.assign(this.state.participants, participant)});
       }
-
-
-
     } else {
       var id = stream.getOriginalStream().id;
 
@@ -226,8 +223,8 @@ var Container = React.createClass({
       var newSpeaker = 'participant_' + resourceJid;
 
       if(this.state.participants[newSpeaker] && !this.state.pinnedParticipant) {
-        this.changeLargeVideoTo(this.state.participants[newSpeaker], this.state.participants[newSpeaker].screen);
-        this.setState({dominantSpeaker: newSpeaker});
+        this.changeLargeVideoTo(this.state.participants[newSpeaker]);
+        this.setState({dominantSpeaker: newSpeaker, previousDominantSpeaker: this.state.dominantSpeaker});
       }
     }
   },
@@ -292,6 +289,18 @@ var Container = React.createClass({
   deleteParticipant: function(jid) {
     this.setState({participants: _.omit(this.state.participants, 
       'participant_' + Strophe.getResourceFromJid(jid))});
+
+    if(this.state.largeVideo.userJid === jid) {
+      if(this.state.dominantSpeaker && this.state.participants[this.state.dominantSpeaker]) {
+        this.changeLargeVideoTo(this.state.participants[this.state.dominantSpeaker]);
+      } else 
+      if(this.state.previousDominantSpeaker && this.state.participants[this.state.previousDominantSpeaker]) {
+        this.changeLargeVideoTo(this.state.participants[this.state.previousDominantSpeaker]);
+      } else {
+        this.changeLargeVideoTo(this.state.local);
+      }
+      this.setState({pinnedParticipant: null});
+    }
   },
 
   updateAudioLevel: function(jid, audioLevel) {
@@ -334,7 +343,7 @@ var Container = React.createClass({
       var participantId = 'participant_' + Strophe.getResourceFromJid(jid);
 
       if(this.state.participants[participantId]) {
-        this.changeLargeVideoTo(this.state.participants[participantId], this.state.participants[participantId].screen);
+        this.changeLargeVideoTo(this.state.participants[participantId]);
         this.setState({pinnedParticipant: jid});
       }
     }
