@@ -34,6 +34,8 @@ function registerListeners() {
   
   APP.UI.addListener(UIEvents.NICKNAME_CHANGED, onNicknameChanged);
 
+  APP.xmpp.addListener(XMPPEvents.CONNECTION_FAILED, onXmppConnectionFailed);
+
   APP.xmpp.addListener(XMPPEvents.DISPLAY_NAME_CHANGED, onDisplayNameChanged);
 
   APP.xmpp.addListener(XMPPEvents.MESSAGE_RECEIVED, processCommandReceivedThroughChat);
@@ -65,21 +67,21 @@ function registerListeners() {
   APP.statistics.addAudioLevelListener(audioLevelHandler);
 }
 
-function streamHandler(stream) {
+function streamHandler(stream, isMuted) {
   switch (stream.type) {
     case "audio":
-      View.changeLocalAudio(stream);
+      View.changeLocalAudio(stream, isMuted);
     break;
     case "video":
-      View.changeLocalVideo(stream);
+      View.changeLocalVideo(stream, isMuted);
     break;
     case "stream":
-      View.changeLocalVideo(stream);
+      View.changeLocalVideo(stream, isMuted);
     break;
   }
 }
 
-function remoteStreamHandler(stream) {
+function remoteStreamHandler(stream, isMuted) {
   View.addStream(stream);
 }
 
@@ -130,6 +132,10 @@ function processCommandReceivedThroughChat(from, display, command) {
   if(Strophe.getResourceFromJid(from)!==APP.xmpp.myResource()) {
     View.processCommand(JSON.parse(command));
   }
+}
+
+function onXmppConnectionFailed(stropheErrorMsg) {
+  UI.messageHandler.openDialog('XMPP Connection Failed', stropheErrorMsg);
 }
 
 UI.start = function() {
