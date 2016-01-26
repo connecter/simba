@@ -1,0 +1,26 @@
+sudo: required
+
+services:
+  - docker
+
+language: node_js
+
+node_js:
+  - "4.1"
+  
+before_install:
+  - echo "node version $(node -v) running"
+  - echo "npm version $(npm -v) running"
+  
+install:
+  - bundle install
+  - npm install
+  
+script:
+  - gulp build
+  - docker build -t simba .
+  
+after_success:
+- docker tag site connecter/simba:travis
+- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+- docker push connecter/simba:travis
