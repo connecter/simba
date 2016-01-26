@@ -11,7 +11,7 @@ node_js:
 before_install:
   - echo "node version $(node -v) running"
   - echo "npm version $(npm -v) running"
-  - cd app/meet && npm install
+  - ( cd app/meet ; npm install )
   
 install:
   - bundle install
