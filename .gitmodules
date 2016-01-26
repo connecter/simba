@@ -3,4 +3,4 @@
 	url = https://github.com/jitsi/jitsi-meet.git
 [submodule "app/images"]
 	path = app/images
-	url = git@bitbucket.org:connecter/connecter.io-design-files-and-assets.git
+	url = https://github.com/connecter/design-files.git
