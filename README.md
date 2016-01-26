@@ -1,5 +1,8 @@
 Connecter Front-End Docker Container
 ====
+
+[![Build Status](https://travis-ci.org/connecter/simba.svg?branch=master)](https://travis-ci.org/connecter/simba)
+
 [![wercker status](https://app.wercker.com/status/30e8c1fc2106f2cb44f46abd4d264ecb/m "wercker status")](https://app.wercker.com/project/bykey/30e8c1fc2106f2cb44f46abd4d264ecb)
 
 Front-end JavaScript app packed with nginx
