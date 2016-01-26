@@ -1,27 +1,31 @@
 sudo: required
 
 services:
-  - docker
+- docker
 
 language: node_js
-
 node_js:
-  - "4.1"
-  
+- '4.1'
+
 before_install:
-  - echo "node version $(node -v) running"
-  - echo "npm version $(npm -v) running"
-  - ( cd app/meet ; npm install )
-  
+- openssl aes-256-cbc -K $encrypted_92d7bde791f8_key -iv $encrypted_92d7bde791f8_iv
+  -in connecter-docker.pem.enc -out connecter-docker.pem -d
+- echo "node version $(node -v) running"
+- echo "npm version $(npm -v) running"
+- ( cd app/meet ; npm install )
+
 install:
-  - bundle install
-  - npm install
-  
+- bundle install
+- npm install
+
 script:
-  - gulp build
-  - docker build -t simba .
-  
+- gulp build
+- docker build -t simba .
+
 after_success:
 - docker tag simba connecter/simba:travis
 - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker push connecter/simba:travis
+
+- ssh -i connecter-docker.pem -l core -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $HOSTNAME "fleetctl stop simba@1.service && fleetctl start simba@1.service"
+- ssh -i connecter-docker.pem -l core -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $HOSTNAME "docker ps -a"
